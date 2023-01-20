@@ -3,15 +3,6 @@ import { parseFragment, serialize } from "parse5";
 import { ChildNode } from "parse5/dist/tree-adapters/default";
 import { defaultTreeAdapter } from "parse5";
 
-const FileParserOld = {
-  readFile(path: string) {
-    const source = readFileSync(path, { encoding: "utf8" });
-    const fragment = parseFragment(source);
-
-    return fragment;
-  },
-};
-
 const IncludeEl = {
   NODE_NAME: "include",
   ATTRIBUTES: {
@@ -30,9 +21,7 @@ class FileParser {
     this.OUTPUT_PATH = outputPath;
   }
   readFile(path: string) {
-    const source = readFileSync(path, { encoding: "utf8" });
-    const fragment = parseFragment(source);
-    return fragment;
+    return readFileSync(path, { encoding: "utf8" });
   }
 
   writeFile(path: string, content: string) {
@@ -51,17 +40,24 @@ class FileParser {
       if (node.nodeName === IncludeEl.NODE_NAME) {
         indentNumber++;
         const { attrs } = node;
-        attrs.forEach((attr) => {
-          if (attr.name === IncludeEl.ATTRIBUTES.SRC) {
-            const newNodes = this.readFile(attr.value).childNodes;
-            newNodes.forEach((newNode) => {
-              newNode.parentNode = node.parentNode;
-            });
-            nodes.splice(i, 1, ...newNodes);
+        const templateAttribute = attrs.find(
+          (attr) => attr.name === IncludeEl.ATTRIBUTES.SRC
+        );
+        let source = this.readFile(templateAttribute.value);
 
-            this.walkTree(newNodes, indentNumber);
-          }
+        const contextAttribute = attrs.find(
+          (attr) => attr.name === IncludeEl.ATTRIBUTES.WITH
+        );
+        const context = this.parseContext(contextAttribute.value);
+        context.forEach((value) => {
+          source = source.replaceAll(`{${value.key}}`, value.value);
         });
+
+        const fragments = parseFragment(source);
+        const newNodes = fragments.childNodes;
+        nodes.splice(i, 1, ...newNodes);
+
+        this.walkTree(newNodes, indentNumber);
       } else if (childNodes) {
         childNodes.forEach((childNode) => {
           if (defaultTreeAdapter.isTextNode(childNode)) {
@@ -78,10 +74,26 @@ class FileParser {
     });
   }
 
-  parse() {
-    const tags = this.readFile(this.INPUT_PATH);
-    const nodes = tags.childNodes;
+  parseContext(attrValue: string) {
+    let values: Record<"key" | "value", string>[] = [];
+    const valuesArray = attrValue.split(";");
+    valuesArray.forEach((value) => {
+      const valueArray = value.split(":");
+      const key = valueArray[0];
+      if (valueArray.length > 1 && key) {
+        values.push({
+          key,
+          value: valueArray[1].replaceAll(" ", "").replaceAll("'", ""),
+        });
+      }
+    });
+    return values;
+  }
 
+  parse() {
+    const source = this.readFile(this.INPUT_PATH);
+    const tags = parseFragment(source);
+    const nodes = tags.childNodes;
     let indentNumber = 1;
     this.walkTree(nodes, indentNumber);
     tags.childNodes = nodes;
