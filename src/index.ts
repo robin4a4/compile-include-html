@@ -11,15 +11,9 @@ const IncludeEl = {
   },
 } as const;
 
-class FileParser {
+export class FileParser {
   INDENT = "    " as const;
-  INPUT_PATH: string;
-  OUTPUT_PATH: string;
 
-  constructor(inputPath: string, outputPath: string) {
-    this.INPUT_PATH = inputPath;
-    this.OUTPUT_PATH = outputPath;
-  }
   readFile(path: string) {
     return readFileSync(path, { encoding: "utf8" });
   }
@@ -43,11 +37,13 @@ class FileParser {
         const templateAttribute = attrs.find(
           (attr) => attr.name === IncludeEl.ATTRIBUTES.SRC
         );
-        let source = this.readFile(templateAttribute.value);
-
         const contextAttribute = attrs.find(
           (attr) => attr.name === IncludeEl.ATTRIBUTES.WITH
         );
+        if (!templateAttribute || !contextAttribute) return;
+
+        let source = this.readFile(templateAttribute.value);
+
         const context = this.parseContext(contextAttribute.value);
         context.forEach((value) => {
           source = source.replaceAll(`{${value.key}}`, value.value);
@@ -79,19 +75,19 @@ class FileParser {
     const valuesArray = attrValue.split(";");
     valuesArray.forEach((value) => {
       const valueArray = value.split(":");
-      const key = valueArray[0];
-      if (valueArray.length > 1 && key) {
+      const keyFromArray = valueArray[0];
+      const valueFromArray = valueArray[1];
+      if (valueArray.length > 1 && keyFromArray && valueFromArray) {
         values.push({
-          key,
-          value: valueArray[1].replaceAll(" ", "").replaceAll("'", ""),
+          key: keyFromArray,
+          value: valueFromArray.trim().replaceAll("'", ""),
         });
       }
     });
     return values;
   }
 
-  parse() {
-    const source = this.readFile(this.INPUT_PATH);
+  parse(source: string) {
     const tags = parseFragment(source);
     const nodes = tags.childNodes;
     let indentNumber = 1;
@@ -100,16 +96,14 @@ class FileParser {
     return tags;
   }
 
-  serialize() {
-    const newTags = this.parse();
+  serialize(source: string) {
+    const newTags = this.parse(source);
     return serialize(newTags);
   }
 
-  run() {
-    const content = this.serialize();
-    this.writeFile(this.OUTPUT_PATH, content);
+  run(inputPath: string, outputPath: string) {
+    const source = this.readFile(inputPath);
+    const content = this.serialize(source);
+    this.writeFile(outputPath, content);
   }
 }
-
-const parser = new FileParser("in.html", "out.html");
-console.log(parser.serialize());

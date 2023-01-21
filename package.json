@@ -1,12 +1,25 @@
 {
+  "name": "compile-include-html",
+  "license": "MIT",
+  "author": "Robin Marillia",
+  "version": "0.0.1",
+  "main": "./dist/index.js",
+  "module": "./dist/index.cjs",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "dev": "tsc script.ts --watch"
+    "dev": "tsc src/FileParser.ts --watch",
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "lint": "tsc",
+    "test": "vitest"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.26.0",
     "@types/node": "^18.11.18",
-    "typescript": "^4.9.4"
+    "typescript": "^4.9.4",
+    "vitest": "^0.27.3"
   },
   "dependencies": {
-    "parse5": "^7.1.2"
+    "parse5": "^7.1.2",
+    "tsup": "^6.5.0"
   }
 }
