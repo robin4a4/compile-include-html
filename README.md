@@ -1,6 +1,6 @@
 # compile-include-html
 
-Small parser that allows including multiple html files in one using a <include> tag.
+Small parser that allows including multiple html files in one using a `<include>` tag.
 
 ## Exemple
 
@@ -22,7 +22,7 @@ Small parser that allows including multiple html files in one using a <include> 
 
 
 ```html
-<!-- main.html after copilation -->
+<!-- main.html after compilation -->
 
 <div class="container">
     <div class="card">

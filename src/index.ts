@@ -107,3 +107,6 @@ export class FileParser {
     this.writeFile(outputPath, content);
   }
 }
+
+const parser = new FileParser();
+parser.run("./input.html", "output.html");
