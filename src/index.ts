@@ -3,16 +3,15 @@ import { parseFragment, serialize } from "parse5";
 import { ChildNode } from "parse5/dist/tree-adapters/default";
 import { defaultTreeAdapter } from "parse5";
 
-const IncludeEl = {
-  NODE_NAME: "include",
-  ATTRIBUTES: {
-    SRC: "src",
-    WITH: "with",
-  },
-} as const;
-
 export class FileParser {
   INDENT = "    " as const;
+  globalPreviousTemplateSrc: string;
+  globalPeviousIndent: number;
+
+  constructor() {
+    this.globalPreviousTemplateSrc = "";
+    this.globalPeviousIndent = 0;
+  }
 
   readFile(path: string) {
     return readFileSync(path, { encoding: "utf8" });
@@ -31,17 +30,20 @@ export class FileParser {
     nodes?.forEach((node) => {
       const childNodes = (node as ChildNode & { childNodes: ChildNode[] })
         .childNodes; // for some reason typescript cannot see that there is, in fact, a childNode property to ChildNode
-      if (node.nodeName === IncludeEl.NODE_NAME) {
-        indentNumber++;
+      if (node.nodeName === "include") {
         const { attrs } = node;
-        const templateAttribute = attrs.find(
-          (attr) => attr.name === IncludeEl.ATTRIBUTES.SRC
-        );
-        const contextAttribute = attrs.find(
-          (attr) => attr.name === IncludeEl.ATTRIBUTES.WITH
-        );
+        const templateAttribute = attrs.find((attr) => attr.name === "src");
+        const contextAttribute = attrs.find((attr) => attr.name === "with");
         if (!templateAttribute || !contextAttribute) return;
-
+        if (
+          templateAttribute.value === this.globalPreviousTemplateSrc &&
+          this.globalPeviousIndent !== indentNumber
+        ) {
+          throw new Error("Can't include template from self.");
+        }
+        indentNumber++;
+        this.globalPeviousIndent = indentNumber;
+        this.globalPreviousTemplateSrc = templateAttribute.value;
         let source = this.readFile(templateAttribute.value);
 
         const context = this.parseContext(contextAttribute.value);
@@ -107,6 +109,3 @@ export class FileParser {
     this.writeFile(outputPath, content);
   }
 }
-
-const parser = new FileParser();
-parser.run("./input.html", "output.html");
