@@ -5,12 +5,13 @@ import { defaultTreeAdapter } from "parse5";
 
 export class FileParser {
   INDENT = "    " as const;
-  globalPreviousTemplateSrc: string;
-  globalPeviousIndent: number;
+  globalStack: {
+    fileName: string;
+    depth: number;
+  }[];
 
   constructor() {
-    this.globalPreviousTemplateSrc = "";
-    this.globalPeviousIndent = 0;
+    this.globalStack = [];
   }
 
   readFile(path: string) {
@@ -25,28 +26,31 @@ export class FileParser {
     });
   }
 
-  walkTree(nodes: ChildNode[], indentNumber: number) {
+  walkTree(nodes: ChildNode[], depth: number) {
     let i = 0;
     nodes?.forEach((node) => {
       const childNodes = (node as ChildNode & { childNodes: ChildNode[] })
         .childNodes; // for some reason typescript cannot see that there is, in fact, a childNode property to ChildNode
       if (node.nodeName === "include") {
         const { attrs } = node;
-        const templateAttribute = attrs.find((attr) => attr.name === "src");
-        const contextAttribute = attrs.find((attr) => attr.name === "with");
-        if (!templateAttribute || !contextAttribute) return;
+        const srcAttr = attrs.find((attr) => attr.name === "src");
+        const contextAttr = attrs.find((attr) => attr.name === "with");
+        if (!srcAttr || !contextAttr) return;
+
         if (
-          templateAttribute.value === this.globalPreviousTemplateSrc &&
-          this.globalPeviousIndent !== indentNumber
+          this.globalStack.find(
+            (item) => item.fileName === srcAttr.value && item.depth !== depth
+          )
         ) {
           throw new Error("Can't include template from self.");
         }
-        indentNumber++;
-        this.globalPeviousIndent = indentNumber;
-        this.globalPreviousTemplateSrc = templateAttribute.value;
-        let source = this.readFile(templateAttribute.value);
+        this.globalStack.push({
+          fileName: srcAttr.value,
+          depth: depth,
+        });
+        let source = this.readFile(srcAttr.value);
 
-        const context = this.parseContext(contextAttribute.value);
+        const context = this.parseContext(contextAttr.value);
         context.forEach((value) => {
           source = source.replaceAll(`{${value.key}}`, value.value);
         });
@@ -55,18 +59,14 @@ export class FileParser {
         const newNodes = fragments.childNodes;
         nodes.splice(i, 1, ...newNodes);
 
-        this.walkTree(newNodes, indentNumber);
+        this.walkTree(newNodes, depth);
+      } else if (defaultTreeAdapter.isTextNode(node)) {
+        node.value = node.value.replaceAll(
+          "\n",
+          "\n" + this.INDENT.repeat(depth - 1)
+        );
       } else if (childNodes) {
-        childNodes.forEach((childNode) => {
-          if (defaultTreeAdapter.isTextNode(childNode)) {
-            childNode.value = childNode.value.replaceAll(
-              "\n",
-              "\n" + this.INDENT.repeat(indentNumber - 1)
-            );
-          }
-        });
-
-        this.walkTree(childNodes, indentNumber);
+        this.walkTree(childNodes, depth + 1);
       }
       i++;
     });
@@ -92,8 +92,8 @@ export class FileParser {
   parse(source: string) {
     const tags = parseFragment(source);
     const nodes = tags.childNodes;
-    let indentNumber = 1;
-    this.walkTree(nodes, indentNumber);
+    const depth = 0;
+    this.walkTree(nodes, depth);
     tags.childNodes = nodes;
     return tags;
   }
