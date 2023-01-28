@@ -50,6 +50,18 @@ test("double include with indentation and random code between", async () => {
   );
 });
 
+test("simple include with optional indentation", async () => {
+  const input = `<div>\n  <include src="card.html" with="text: 'hello world'"></include>\n</div>`;
+  vi.spyOn(FileParser.prototype, "readFile").mockImplementation(() => {
+    const card = `<div class="card">\n    {text}\n</div>`;
+    return card;
+  });
+  const parserTest = new FileParser({ indent: 2 });
+  expect(parserTest.serialize(input)).toBe(
+    `<div>\n  <div class="card">\n      hello world\n  </div>\n</div>`
+  );
+});
+
 test.fails("recursive include should break", async () => {
   const input = `<div><include src="card.html" with="text: 'hello world'"></include></div>`;
   vi.spyOn(FileParser.prototype, "readFile").mockImplementation(() => {

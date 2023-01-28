@@ -3,14 +3,23 @@ import { parseFragment, serialize } from "parse5";
 import { ChildNode } from "parse5/dist/tree-adapters/default";
 import { defaultTreeAdapter } from "parse5";
 
+type TOptions = {
+  indent: number;
+};
+
 export class FileParser {
-  INDENT = "    " as const;
+  options: TOptions = {
+    indent: 4,
+  };
+  INDENT: string;
   globalStack: {
     fileName: string;
     depth: number;
   }[];
 
-  constructor() {
+  constructor(options?: TOptions) {
+    if (options) this.options = options;
+    this.INDENT = " ".repeat(this.options.indent);
     this.globalStack = [];
   }
 
