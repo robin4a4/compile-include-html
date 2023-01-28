@@ -2,9 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@changesets/cli': ^2.26.0
-  '@types/mock-fs': ^4.13.1
   '@types/node': ^18.11.18
-  mock-fs: ^5.2.0
   parse5: ^7.1.2
   tsup: ^6.5.0
   typescript: ^4.9.4
@@ -16,9 +14,7 @@ dependencies:
 
 devDependencies:
   '@changesets/cli': 2.26.0
-  '@types/mock-fs': 4.13.1
   '@types/node': 18.11.18
-  mock-fs: 5.2.0
   typescript: 4.9.4
   vitest: 0.27.3
 
@@ -508,12 +504,6 @@ packages:
 
   /@types/minimist/1.2.2:
     resolution: {integrity: sha512-jhuKLIRrhvCPLqwPcx6INqmKeiA5EWrsCOPhrlFSrbrmU4ZMPjj5Ul/oLCMDO98XRUIwVm78xICz4EPCektzeQ==}
-    dev: true
-
-  /@types/mock-fs/4.13.1:
-    resolution: {integrity: sha512-m6nFAJ3lBSnqbvDZioawRvpLXSaPyn52Srf7OfzjubYbYX8MTUdIgDxQl0wEapm4m/pNYSd9TXocpQ0TvZFlYA==}
-    dependencies:
-      '@types/node': 18.11.18
     dev: true
 
   /@types/node/12.20.55:
@@ -1877,11 +1867,6 @@ packages:
       pathe: 1.1.0
       pkg-types: 1.0.1
       ufo: 1.0.1
-    dev: true
-
-  /mock-fs/5.2.0:
-    resolution: {integrity: sha512-2dF2R6YMSZbpip1V1WHKGLNjr/k48uQClqMVb5H3MOvwc9qhYis3/IWbj02qIg/Y8MDXKFF4c5v0rxx2o6xTZw==}
-    engines: {node: '>=12.0.0'}
     dev: true
 
   /ms/2.1.2:
