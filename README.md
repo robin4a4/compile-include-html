@@ -30,3 +30,30 @@ Small parser that allows including multiple html files in one using a `<include>
     </div>
 </div>
 ```
+
+## Includer
+
+Create a new includer with 
+
+```javascript
+import {Includer} from "compile-include-html"
+const includer = new Includer();
+```
+
+### Methods
+
+#### `readFile(path: string): string`
+
+Use it to read a file and retrieve a string of the file's content.
+
+#### `transform(source: string): string`
+
+Use it to transform a string using the include tag into its compiled version.
+
+
+#### `run(inputPath: string, outputPath: string): void`
+
+Use it to compile an input file located at `inputPath` and create an output file located at `outputPath`.
+
+
+

@@ -7,7 +7,7 @@ type TOptions = {
   indent: number;
 };
 
-export class FileParser {
+export class Includer {
   options: TOptions = {
     indent: 4,
   };
@@ -23,11 +23,22 @@ export class FileParser {
     this.globalStack = [];
   }
 
-  readFile(path: string) {
+  public readFile(path: string) {
     return readFileSync(path, { encoding: "utf8" });
   }
 
-  writeFile(path: string, content: string) {
+  public transform(source: string) {
+    const newTags = this._parse(source);
+    return serialize(newTags);
+  }
+
+  public run(inputPath: string, outputPath: string) {
+    const source = this.readFile(inputPath);
+    const content = this.transform(source);
+    this._writeFile(outputPath, content);
+  }
+
+  _writeFile(path: string, content: string) {
     writeFile(path, content, (err) => {
       if (err) {
         console.error(err);
@@ -35,7 +46,7 @@ export class FileParser {
     });
   }
 
-  walkTree(nodes: ChildNode[], depth: number) {
+  _walkTree(nodes: ChildNode[], depth: number) {
     let i = 0;
     nodes?.forEach((node) => {
       const childNodes = (node as ChildNode & { childNodes: ChildNode[] })
@@ -59,7 +70,7 @@ export class FileParser {
         });
         let source = this.readFile(srcAttr.value);
 
-        const context = this.parseContext(contextAttr.value);
+        const context = this._parseContext(contextAttr.value);
         context.forEach((value) => {
           source = source.replaceAll(`{${value.key}}`, value.value);
         });
@@ -68,20 +79,20 @@ export class FileParser {
         const newNodes = fragments.childNodes;
         nodes.splice(i, 1, ...newNodes);
 
-        this.walkTree(newNodes, depth);
+        this._walkTree(newNodes, depth);
       } else if (defaultTreeAdapter.isTextNode(node)) {
         node.value = node.value.replaceAll(
           "\n",
           "\n" + this.INDENT.repeat(depth - 1)
         );
       } else if (childNodes) {
-        this.walkTree(childNodes, depth + 1);
+        this._walkTree(childNodes, depth + 1);
       }
       i++;
     });
   }
 
-  parseContext(attrValue: string) {
+  _parseContext(attrValue: string) {
     let values: Record<"key" | "value", string>[] = [];
     const valuesArray = attrValue.split(";");
     valuesArray.forEach((value) => {
@@ -98,23 +109,12 @@ export class FileParser {
     return values;
   }
 
-  parse(source: string) {
+  _parse(source: string) {
     const tags = parseFragment(source);
     const nodes = tags.childNodes;
     const depth = 0;
-    this.walkTree(nodes, depth);
+    this._walkTree(nodes, depth);
     tags.childNodes = nodes;
     return tags;
-  }
-
-  serialize(source: string) {
-    const newTags = this.parse(source);
-    return serialize(newTags);
-  }
-
-  run(inputPath: string, outputPath: string) {
-    const source = this.readFile(inputPath);
-    const content = this.serialize(source);
-    this.writeFile(outputPath, content);
   }
 }
