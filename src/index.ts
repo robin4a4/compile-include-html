@@ -1,25 +1,31 @@
 import { readFileSync, writeFile } from "fs";
-import { parseFragment, serialize } from "parse5";
+import { parseFragment, parse, serialize } from "parse5";
 import { ChildNode } from "parse5/dist/tree-adapters/default";
 import { defaultTreeAdapter } from "parse5";
 
 type TOptions = {
-  indent: number;
+  indent?: number;
+  inputIsDocument?: boolean;
 };
 
 export class Includer {
-  options: TOptions = {
-    indent: 4,
-  };
+  options: TOptions = {};
   INDENT: string;
   globalStack: {
     fileName: string;
     depth: number;
   }[];
 
+  get computedOptions() {
+    return {
+      indent: this.options.indent || 4,
+      inputIsDocument: this.options.inputIsDocument || false,
+    };
+  }
+
   constructor(options?: TOptions) {
     if (options) this.options = options;
-    this.INDENT = " ".repeat(this.options.indent);
+    this.INDENT = " ".repeat(this.computedOptions.indent);
     this.globalStack = [];
   }
 
@@ -56,7 +62,6 @@ export class Includer {
         const srcAttr = attrs.find((attr) => attr.name === "src");
         const contextAttr = attrs.find((attr) => attr.name === "with");
         if (!srcAttr || !contextAttr) return;
-
         if (
           this.globalStack.find(
             (item) => item.fileName === srcAttr.value && item.depth !== depth
@@ -69,22 +74,21 @@ export class Includer {
           depth: depth,
         });
         let source = this.readFile(srcAttr.value);
-
         const context = this._parseContext(contextAttr.value);
         context.forEach((value) => {
           source = source.replaceAll(`{${value.key}}`, value.value);
         });
-
         const fragments = parseFragment(source);
         const newNodes = fragments.childNodes;
         nodes.splice(i, 1, ...newNodes);
-
         this._walkTree(newNodes, depth);
       } else if (defaultTreeAdapter.isTextNode(node)) {
-        node.value = node.value.replaceAll(
-          "\n",
-          "\n" + this.INDENT.repeat(depth - 1)
-        );
+        if (depth > 0) {
+          node.value = node.value.replaceAll(
+            "\n",
+            "\n" + this.INDENT.repeat(depth - 1)
+          );
+        }
       } else if (childNodes) {
         this._walkTree(childNodes, depth + 1);
       }
@@ -110,7 +114,8 @@ export class Includer {
   }
 
   _parse(source: string) {
-    const tags = parseFragment(source);
+    const parser = this.computedOptions.inputIsDocument ? parse : parseFragment;
+    const tags = parser(source);
     const nodes = tags.childNodes;
     const depth = 0;
     this._walkTree(nodes, depth);
