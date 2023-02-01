@@ -1,5 +1,11 @@
 # compile-include-html
 
+## 1.0.3
+
+### Patch Changes
+
+- bf4257c: add files property to package.json
+
 ## 1.0.2
 
 ### Patch Changes
