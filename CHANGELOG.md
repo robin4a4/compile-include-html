@@ -1,5 +1,11 @@
 # compile-include-html
 
+## 1.0.2
+
+### Patch Changes
+
+- 82be214: add correct build script
+
 ## 1.0.1
 
 ### Patch Changes
