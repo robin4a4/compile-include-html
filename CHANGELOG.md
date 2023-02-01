@@ -1,5 +1,11 @@
 # compile-include-html
 
+## 1.0.4
+
+### Patch Changes
+
+- dea8a2c: add support for document
+
 ## 1.0.3
 
 ### Patch Changes
