@@ -33,12 +33,28 @@ Small parser that allows including multiple html files in one using a `<include>
 
 ## Includer
 
-Create a new includer with 
+Install with: 
 
-```javascript
+```
+npm i compile-include-html
+```
+
+Create a new includer with:
+
+```typescript
 import {Includer} from "compile-include-html"
 const includer = new Includer();
 ```
+
+### Options
+
+```typescript
+options: {
+    indent: number
+}
+```
+
+You can pass an option object to your includer. For now the only property is `indent` which sets the indentation of the included HTML.
 
 ### Methods
 
