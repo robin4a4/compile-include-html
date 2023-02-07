@@ -1,5 +1,11 @@
 # compile-include-html
 
+## 1.0.6
+
+### Patch Changes
+
+- 17372be: add repository and keywords to package.json
+
 ## 1.0.5
 
 ### Patch Changes
