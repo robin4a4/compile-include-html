@@ -23,7 +23,7 @@
     "build": "tsup src/index.ts --format cjs,esm --dts",
     "lint": "tsc",
     "test": "vitest",
-    "release": "npm run build & changeset publish & git push --follow-tags"
+    "release": "pnpm run build & changeset publish & git push --follow-tags"
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.0",
