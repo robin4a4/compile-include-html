@@ -1,5 +1,11 @@
 # compile-include-html
 
+## 1.0.5
+
+### Patch Changes
+
+- 6e58c5f: add inputIsDocument to documentation.
+
 ## 1.0.4
 
 ### Patch Changes
