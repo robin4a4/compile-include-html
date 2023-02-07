@@ -1,5 +1,11 @@
 # compile-include-html
 
+## 1.0.8
+
+### Patch Changes
+
+- 1c6db97: use pnpm to build
+
 ## 1.0.7
 
 ### Patch Changes
