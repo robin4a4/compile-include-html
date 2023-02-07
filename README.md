@@ -50,11 +50,12 @@ const includer = new Includer();
 
 ```typescript
 options: {
-    indent: number
+    indent?: number,
+    inputIsDocument?: boolean
 }
 ```
 
-You can pass an option object to your includer. For now the only property is `indent` which sets the indentation of the included HTML.
+You can pass an option object to your includer. For now the only properties are `indent` which sets the indentation of the included HTML and `inputIsDocument` which sets whether the input is an entire document with `<DOCTYPE>`, `<head>` and `<body>` tags. 
 
 ### Methods
 

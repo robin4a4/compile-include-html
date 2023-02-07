@@ -7,13 +7,13 @@
   "module": "./dist/index.cjs",
   "types": "./dist/index.d.ts",
   "files": [
-    "dist/*"
+    "dist/index.d.ts", "dist/index.js", "dist/index.mjs"
   ],
   "publishConfig": {
     "access": "public"
   },
   "scripts": {
-    "dev": "tsc src/FileParser.ts --watch",
+    "dev": "tsc src/index.ts --watch",
     "build": "tsup src/index.ts --format cjs,esm --dts",
     "lint": "tsc",
     "test": "vitest",
