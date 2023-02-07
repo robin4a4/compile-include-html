@@ -3,17 +3,21 @@
   "license": "MIT",
   "author": "Robin Marillia",
   "version": "1.0.5",
-  "main": "./dist/index.js",
-  "module": "./dist/index.cjs",
-  "types": "./dist/index.d.ts",
-  "files": [
-    "dist/index.d.ts",
-    "dist/index.js",
-    "dist/index.mjs"
-  ],
+  "main": "dist/index.js",
+  "module": "dist/index.cjs",
+  "types": "dist/index.d.ts",
   "publishConfig": {
     "access": "public"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/robin4a4/compile-include-html.git"
+  },
+  "keywords": [
+    "html",
+    "compiler",
+    "include"
+  ],
   "scripts": {
     "dev": "tsc src/index.ts --watch",
     "build": "tsup src/index.ts --format cjs,esm --dts",
