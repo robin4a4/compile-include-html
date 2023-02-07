@@ -1,5 +1,11 @@
 # compile-include-html
 
+## 1.0.7
+
+### Patch Changes
+
+- 98b84a0: fix module key in package.json
+
 ## 1.0.6
 
 ### Patch Changes
