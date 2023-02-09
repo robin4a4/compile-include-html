@@ -1,5 +1,11 @@
 # compile-include-html
 
+## 1.0.9
+
+### Patch Changes
+
+- fbb9d33: add run keyword
+
 ## 1.0.8
 
 ### Patch Changes
