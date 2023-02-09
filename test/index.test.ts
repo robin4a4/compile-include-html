@@ -62,9 +62,20 @@ test("simple include with optional indentation", async () => {
   );
 });
 
+test("simple include without context", async () => {
+  const input = `<div>\n  <include src="card.html"></include>\n</div>`;
+  vi.spyOn(Includer.prototype, "readFile").mockImplementation(() => {
+    const card = `<div class="card">\n    hello world\n</div>`;
+    return card;
+  });
+  const parserTest = new Includer({ indent: 2 });
+  expect(parserTest.transform(input)).toBe(
+    `<div>\n  <div class="card">\n      hello world\n  </div>\n</div>`
+  );
+});
+
 test.skip("vite default template", async () => {
-  const input = `<!DOCTYPE html>
-<html lang="en">
+  const input = `<!DOCTYPE html><html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />

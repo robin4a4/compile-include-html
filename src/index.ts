@@ -61,7 +61,7 @@ export class Includer {
         const { attrs } = node;
         const srcAttr = attrs.find((attr) => attr.name === "src");
         const contextAttr = attrs.find((attr) => attr.name === "with");
-        if (!srcAttr || !contextAttr) return;
+        if (!srcAttr) return;
         if (
           this.globalStack.find(
             (item) => item.fileName === srcAttr.value && item.depth !== depth
@@ -74,10 +74,12 @@ export class Includer {
           depth: depth,
         });
         let source = this.readFile(srcAttr.value);
-        const context = this._parseContext(contextAttr.value);
-        context.forEach((value) => {
-          source = source.replaceAll(`{${value.key}}`, value.value);
-        });
+        if (contextAttr) {
+          const context = this._parseContext(contextAttr.value);
+          context.forEach((value) => {
+            source = source.replaceAll(`{${value.key}}`, value.value);
+          });
+        }
         const fragments = parseFragment(source);
         const newNodes = fragments.childNodes;
         nodes.splice(i, 1, ...newNodes);

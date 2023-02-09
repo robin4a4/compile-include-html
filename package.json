@@ -19,7 +19,7 @@
     "include"
   ],
   "scripts": {
-    "dev": "tsc src/index.ts --watch",
+    "dev": "vitest",
     "build": "tsup src/index.ts --format cjs,esm --dts",
     "lint": "tsc",
     "test": "vitest",
