@@ -1,5 +1,11 @@
 # compile-include-html
 
+## 1.0.10
+
+### Patch Changes
+
+- f64fab5: remove need for context
+
 ## 1.0.9
 
 ### Patch Changes
