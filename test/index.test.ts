@@ -74,6 +74,44 @@ test("simple include without context", async () => {
   );
 });
 
+test("for loop without context", async () => {
+  const input = `<div>\n  <for condition="let i = 0; i < 3; i++"><span>hello world</span></for>\n</div>`;
+  const parserTest = new Includer({ indent: 2 });
+  expect(parserTest.transform(input)).toBe(
+    `<div>\n  <span>hello world</span><span>hello world</span><span>hello world</span>\n</div>`
+  );
+});
+
+test("for loop with context", async () => {
+  const input = `<div>\n  <for condition="let i = 0; i < 3; i++"><span>{i}</span></for>\n</div>`;
+  const parserTest = new Includer({ indent: 2 });
+  expect(parserTest.transform(input)).toBe(
+    `<div>\n  <span>1</span><span>2</span><span>3</span>\n</div>`
+  );
+});
+
+test("for looping in array without context", async () => {
+  const input = `<div>\n  <for condition="const item of array"><span>hello</span></for>\n</div>`;
+  const parserTest = new Includer({
+    indent: 2,
+    context: { array: ["a", "b", "c"] },
+  });
+  expect(parserTest.transform(input)).toBe(
+    `<div>\n  <span>hello</span><span>hello</span><span>hello</span>\n</div>`
+  );
+});
+
+test("for looping in array with context", async () => {
+  const input = `<div>\n  <for condition="const item of array"><span>{item}</span></for>\n</div>`;
+  const parserTest = new Includer({
+    indent: 2,
+    context: { array: ["a", "b", "c"] },
+  });
+  expect(parserTest.transform(input)).toBe(
+    `<div>\n  <span>a</span><span>b</span><span>c</span>\n</div>`
+  );
+});
+
 test.skip("vite default template", async () => {
   const input = `<!DOCTYPE html><html lang="en">
   <head>

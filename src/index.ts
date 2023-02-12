@@ -4,6 +4,7 @@ import { ChildNode } from "parse5/dist/tree-adapters/default";
 import { defaultTreeAdapter } from "parse5";
 
 type TOptions = {
+  context?: Record<string, any>;
   indent?: number;
   inputIsDocument?: boolean;
 };
@@ -18,6 +19,7 @@ export class Includer {
 
   get computedOptions() {
     return {
+      context: this.options.context || {},
       indent: this.options.indent || 4,
       inputIsDocument: this.options.inputIsDocument || false,
     };
@@ -84,6 +86,26 @@ export class Includer {
         const newNodes = fragments.childNodes;
         nodes.splice(i, 1, ...newNodes);
         this._walkTree(newNodes, depth);
+      } else if (node.nodeName === "for") {
+        const { attrs } = node;
+        const conditionAttr = attrs.find((attr) => attr.name === "condition");
+        if (!conditionAttr) return;
+        const keyValueArray = conditionAttr.value
+          .replace("const ", "")
+          .split(" of ");
+        const value = keyValueArray[1];
+        if (value && this.computedOptions.context[value]) {
+          const conditionContext = this.computedOptions.context[value];
+          // nodesToMultiply.forEach(node => {
+          //   console.log(node)
+          // })
+          const newNodes = conditionContext.map((conditionContextItem) => {
+            const nodesToMultiply = node.childNodes[0];
+            return nodesToMultiply;
+          });
+          console.log(newNodes);
+          nodes.splice(i, 1, ...newNodes);
+        }
       } else if (defaultTreeAdapter.isTextNode(node)) {
         if (depth > 0) {
           node.value = node.value.replaceAll(
