@@ -94,7 +94,7 @@ test("for looping in array without context", async () => {
   const input = `<div>\n  <for condition="const item of array"><span>hello</span></for>\n</div>`;
   const parserTest = new Includer({
     indent: 2,
-    context: { array: ["a", "b", "c"] },
+    globalContext: { array: ["a", "b", "c"] },
   });
   expect(parserTest.transform(input)).toBe(
     `<div>\n  <span>hello</span><span>hello</span><span>hello</span>\n</div>`
@@ -105,7 +105,7 @@ test("for looping in array with context", async () => {
   const input = `<div>\n  <for condition="const item of array"><span>{item}</span></for>\n</div>`;
   const parserTest = new Includer({
     indent: 2,
-    context: { array: ["a", "b", "c"] },
+    globalContext: { array: ["a", "b", "c"] },
   });
   expect(parserTest.transform(input)).toBe(
     `<div>\n  <span>a</span><span>b</span><span>c</span>\n</div>`

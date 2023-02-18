@@ -4,10 +4,12 @@ import { ChildNode } from "parse5/dist/tree-adapters/default";
 import { defaultTreeAdapter } from "parse5";
 
 type TOptions = {
-  context?: Record<string, any>;
+  globalContext?: Record<string, any>;
   indent?: number;
   inputIsDocument?: boolean;
 };
+
+type TContext = Record<string, any>;
 
 export class Includer {
   options: TOptions = {};
@@ -19,7 +21,7 @@ export class Includer {
 
   get computedOptions() {
     return {
-      context: this.options.context || {},
+      globalContext: this.options.globalContext || {},
       indent: this.options.indent || 4,
       inputIsDocument: this.options.inputIsDocument || false,
     };
@@ -54,7 +56,11 @@ export class Includer {
     });
   }
 
-  _walkTree(nodes: ChildNode[], depth: number) {
+  _walkTree(
+    nodes: ChildNode[],
+    depth: number,
+    context: TContext | null = null
+  ) {
     let i = 0;
     nodes?.forEach((node) => {
       const childNodes = (node as ChildNode & { childNodes: ChildNode[] })
@@ -76,65 +82,85 @@ export class Includer {
           depth: depth,
         });
         let source = this.readFile(srcAttr.value);
+        let context = null;
         if (contextAttr) {
-          const context = this._parseContext(contextAttr.value);
-          context.forEach((value) => {
-            source = source.replaceAll(`{${value.key}}`, value.value);
-          });
+          context = this._parseContext(contextAttr.value);
         }
         const fragments = parseFragment(source);
         const newNodes = fragments.childNodes;
         nodes.splice(i, 1, ...newNodes);
-        this._walkTree(newNodes, depth);
+        this._walkTree(newNodes, depth, context);
       } else if (node.nodeName === "for") {
         const { attrs } = node;
         const conditionAttr = attrs.find((attr) => attr.name === "condition");
         if (!conditionAttr) return;
-        const keyValueArray = conditionAttr.value
+
+        /*
+         Split the condition attribute to retrieve the identifier of the elements to be replaced
+         and the arrayName of the context containing the replacement values.
+         
+         e.g in `const item of array`, item is the identifier and array is the arrayName
+        */
+        const [identifier, arrayName] = conditionAttr.value
           .replace("const ", "")
           .split(" of ");
-        const value = keyValueArray[1];
-        if (value && this.computedOptions.context[value]) {
-          const conditionContext = this.computedOptions.context[value];
-          // nodesToMultiply.forEach(node => {
-          //   console.log(node)
-          // })
-          const newNodes = conditionContext.map((conditionContextItem) => {
-            const nodesToMultiply = node.childNodes[0];
-            return nodesToMultiply;
+        if (identifier && arrayName && context && context[arrayName]) {
+          // retrieve the replacement values in the context
+          const conditionContext = context[arrayName];
+
+          const newMultipliedNodes: ChildNode[] = [];
+          // loop throught the replacement values
+          conditionContext.forEach((conditionContextItem: any) => {
+            // retrieve the nodes to be multiplied
+            const newNodes = node.childNodes;
+            /*
+            For each replacement value, create a localContext.
+            
+            e.g if we have `const item of array`, with `const array = ['a', 'b']`, we will have:
+            - for first loop count `const localContext = {item: 'a'}`
+            - for second loop count `const localContext = {item: 'b'}`
+            */
+            const localContext = { [identifier]: conditionContextItem };
+            this._walkTree(newNodes, depth, localContext);
+            newMultipliedNodes.push(...newNodes);
           });
-          console.log(newNodes);
-          nodes.splice(i, 1, ...newNodes);
+          // add the multiplied nodes in the tree
+          nodes.splice(i, 1, ...newMultipliedNodes);
         }
       } else if (defaultTreeAdapter.isTextNode(node)) {
         if (depth > 0) {
+          if (context) {
+            for (const [key, value] of Object.entries(context)) {
+              if (typeof value === "string") {
+                console.log(`{${key}}`, value);
+                node.value = node.value.replaceAll(`{${key}}`, value);
+              }
+            }
+          }
           node.value = node.value.replaceAll(
             "\n",
             "\n" + this.INDENT.repeat(depth - 1)
           );
         }
       } else if (childNodes) {
-        this._walkTree(childNodes, depth + 1);
+        this._walkTree(childNodes, depth + 1, context);
       }
       i++;
     });
   }
 
-  _parseContext(attrValue: string) {
-    let values: Record<"key" | "value", string>[] = [];
+  _parseContext(attrValue: string): TContext {
+    const context: TContext = {};
     const valuesArray = attrValue.split(";");
     valuesArray.forEach((value) => {
-      const valueArray = value.split(":");
-      const keyFromArray = valueArray[0];
-      const valueFromArray = valueArray[1];
-      if (valueArray.length > 1 && keyFromArray && valueFromArray) {
-        values.push({
-          key: keyFromArray,
-          value: valueFromArray.trim().replaceAll("'", ""),
-        });
+      const [keyFromArray, valueFromArray] = value.split(":");
+      if (keyFromArray && valueFromArray) {
+        context[keyFromArray.trim().replaceAll(" ", "-")] = valueFromArray
+          .trim()
+          .replaceAll("'", "");
       }
     });
-    return values;
+    return context;
   }
 
   _parse(source: string) {
@@ -142,7 +168,7 @@ export class Includer {
     const tags = parser(source);
     const nodes = tags.childNodes;
     const depth = 0;
-    this._walkTree(nodes, depth);
+    this._walkTree(nodes, depth, this.computedOptions.globalContext);
     tags.childNodes = nodes;
     return tags;
   }
