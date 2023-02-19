@@ -112,7 +112,7 @@ export class Includer {
           // loop throught the replacement values
           conditionContext.forEach((conditionContextItem: any) => {
             // retrieve the nodes to be multiplied
-            const newNodes = node.childNodes;
+            const newLocalNodes = parseFragment(serialize(node)).childNodes;
             /*
             For each replacement value, create a localContext.
             
@@ -121,8 +121,8 @@ export class Includer {
             - for second loop count `const localContext = {item: 'b'}`
             */
             const localContext = { [identifier]: conditionContextItem };
-            this._walkTree(newNodes, depth, localContext);
-            newMultipliedNodes.push(...newNodes);
+            this._walkTree(newLocalNodes, depth, localContext);
+            newMultipliedNodes.push(...newLocalNodes);
           });
           // add the multiplied nodes in the tree
           nodes.splice(i, 1, ...newMultipliedNodes);
@@ -130,10 +130,9 @@ export class Includer {
       } else if (defaultTreeAdapter.isTextNode(node)) {
         if (depth > 0) {
           if (context) {
-            for (const [key, value] of Object.entries(context)) {
-              if (typeof value === "string") {
-                console.log(`{${key}}`, value);
-                node.value = node.value.replaceAll(`{${key}}`, value);
+            for (const [key, newValue] of Object.entries(context)) {
+              if (typeof newValue === "string") {
+                node.value = node.value.replaceAll(`{${key}}`, newValue);
               }
             }
           }
