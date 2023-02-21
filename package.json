@@ -22,7 +22,7 @@
     "dev": "vitest",
     "build": "tsup src/index.ts --format cjs,esm --dts",
     "lint": "tsc",
-    "test": "vitest",
+    "test": "vitest run",
     "release": "pnpm run build && changeset publish && git push --follow-tags"
   },
   "devDependencies": {

@@ -14,6 +14,34 @@ test("simple include", async () => {
   );
 });
 
+test("simple include with global context", async () => {
+  const input = `<div><include src="card.html"></include></div>`;
+  vi.spyOn(Includer.prototype, "readFile").mockImplementation(() => {
+    const card = `<div class="card">{text}</div>`;
+    return card;
+  });
+
+  const parser = new Includer({
+    globalContext: { text: "hello world" },
+  });
+  expect(parser.transform(input)).toBe(
+    `<div><div class="card">hello world</div></div>`
+  );
+});
+
+test("just context replacement", async () => {
+  const input = `<ul><li>{firstLi}</li><li>{secondLi}</li></ul>`;
+  vi.spyOn(Includer.prototype, "readFile").mockImplementation(() => {
+    const card = `<div class="card">{text}</div>`;
+    return card;
+  });
+
+  const parser = new Includer({
+    globalContext: { firstLi: "hello", secondLi: "world" },
+  });
+  expect(parser.transform(input)).toBe(`<ul><li>hello</li><li>world</li></ul>`);
+});
+
 test("simple include with indentation", async () => {
   const input = `<div>\n    <include src="card.html" with="text: 'hello world'"></include>\n</div>`;
   vi.spyOn(Includer.prototype, "readFile").mockImplementation(() => {
@@ -120,6 +148,22 @@ test("for looping in array with context, complex version 1", async () => {
   });
   expect(parserTest.transform(input)).toBe(
     `<div>\n  <span><p>a</p><p>hello a</p></span><span>hello</span><span><p>b</p><p>hello b</p></span><span>hello</span>\n</div>`
+  );
+});
+
+test("for looping in array with deep context", async () => {
+  const input = `<div>\n  <for condition="const user of array"><span>{user.firstName}-{user.lastName}</span></for>\n</div>`;
+  const parserTest = new Includer({
+    indent: 2,
+    globalContext: {
+      array: [
+        { firstName: "john", lastName: "doe" },
+        { firstName: "jannet", lastName: "foe" },
+      ],
+    },
+  });
+  expect(parserTest.transform(input)).toBe(
+    `<div>\n  <span>john-doe</span><span>jannet-foe</span>\n</div>`
   );
 });
 

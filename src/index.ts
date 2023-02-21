@@ -2,6 +2,7 @@ import { readFileSync, writeFile } from "fs";
 import { parseFragment, parse, serialize } from "parse5";
 import { ChildNode } from "parse5/dist/tree-adapters/default";
 import { defaultTreeAdapter } from "parse5";
+import { deepStringReplacement } from "./utils";
 
 type TOptions = {
   globalContext?: Record<string, any>;
@@ -82,7 +83,7 @@ export class Includer {
           depth: depth,
         });
         let source = this.readFile(srcAttr.value);
-        let context = null;
+        let context = this.computedOptions.globalContext;
         if (contextAttr) {
           context = this._parseContext(contextAttr.value);
         }
@@ -128,14 +129,10 @@ export class Includer {
           nodes.splice(i, 1, ...newMultipliedNodes);
         }
       } else if (defaultTreeAdapter.isTextNode(node)) {
+        if (context) {
+          node.value = deepStringReplacement(node.value, context);
+        }
         if (depth > 0) {
-          if (context) {
-            for (const [key, newValue] of Object.entries(context)) {
-              if (typeof newValue === "string") {
-                node.value = node.value.replaceAll(`{${key}}`, newValue);
-              }
-            }
-          }
           node.value = node.value.replaceAll(
             "\n",
             "\n" + this.INDENT.repeat(depth - 1)
