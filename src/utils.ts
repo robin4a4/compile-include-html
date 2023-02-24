@@ -1,3 +1,5 @@
+import { TContext } from "./types";
+
 export function deepStringReplacement(
   inputString: string,
   contextObject: Record<string, any>
@@ -32,4 +34,25 @@ export function trimChar(string: string, chars: string) {
 
 export function trimBrackets(string: string) {
   return string.replaceAll("{", "").replace("}", "");
+}
+
+export function parseIncludeContext(
+  attrValue: string,
+  currentContext: TContext | null
+): TContext {
+  let context: TContext = {};
+  const valuesArray = attrValue.split(";");
+  valuesArray.forEach((value) => {
+    const [keyFromArray, valueFromArray] = value.split(":");
+    if (keyFromArray && valueFromArray) {
+      const key = keyFromArray.trim().replaceAll(" ", "-");
+      const value = valueFromArray.trim();
+      if (currentContext && currentContext[value]) {
+        context[key] = currentContext[value];
+      } else {
+        context[key] = valueFromArray.trim().replaceAll("'", "");
+      }
+    }
+  });
+  return context;
 }

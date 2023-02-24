@@ -2,15 +2,8 @@ import { readFileSync, writeFile } from "fs";
 import { parseFragment, parse, serialize } from "parse5";
 import { ChildNode } from "parse5/dist/tree-adapters/default";
 import { defaultTreeAdapter } from "parse5";
-import { deepStringReplacement } from "./utils";
-
-type TOptions = {
-  globalContext?: Record<string, any>;
-  indent?: number;
-  inputIsDocument?: boolean;
-};
-
-type TContext = Record<string, any>;
+import { deepStringReplacement, parseIncludeContext } from "./utils";
+import { TContext, TOptions } from "./types";
 
 export class Includer {
   options: TOptions = {};
@@ -83,14 +76,14 @@ export class Includer {
           depth: depth,
         });
         let source = this.readFile(srcAttr.value);
-        let context = this.computedOptions.globalContext;
+        let localContext = context;
         if (contextAttr) {
-          context = this._parseContext(contextAttr.value);
+          localContext = parseIncludeContext(contextAttr.value, context);
         }
         const fragments = parseFragment(source);
         const newNodes = fragments.childNodes;
         nodes.splice(i, 1, ...newNodes);
-        this._walkTree(newNodes, depth, context);
+        this._walkTree(newNodes, depth, localContext);
       } else if (node.nodeName === "for") {
         const { attrs } = node;
         const conditionAttr = attrs.find((attr) => attr.name === "condition");
@@ -143,20 +136,6 @@ export class Includer {
       }
       i++;
     });
-  }
-
-  _parseContext(attrValue: string): TContext {
-    const context: TContext = {};
-    const valuesArray = attrValue.split(";");
-    valuesArray.forEach((value) => {
-      const [keyFromArray, valueFromArray] = value.split(":");
-      if (keyFromArray && valueFromArray) {
-        context[keyFromArray.trim().replaceAll(" ", "-")] = valueFromArray
-          .trim()
-          .replaceAll("'", "");
-      }
-    });
-    return context;
   }
 
   _parse(source: string) {
