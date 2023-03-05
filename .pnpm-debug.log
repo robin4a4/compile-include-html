@@ -1,0 +1,22 @@
+{
+  "0 debug pnpm:scope": {
+    "selected": 1
+  },
+  "1 error pnpm": {
+    "code": "ELIFECYCLE",
+    "errno": "ENOENT",
+    "syscall": "spawn",
+    "file": "sh",
+    "pkgid": "compile-include-html@1.0.10",
+    "stage": "dev",
+    "script": "vitest",
+    "pkgname": "compile-include-html",
+    "err": {
+      "name": "pnpm",
+      "message": "compile-include-html@1.0.10 dev: `vitest`\nspawn ENOENT",
+      "code": "ELIFECYCLE",
+      "stack": "pnpm: compile-include-html@1.0.10 dev: `vitest`\nspawn ENOENT\n    at ChildProcess.<anonymous> (/usr/local/lib/node_modules/pnpm/dist/pnpm.cjs:93448:22)\n    at ChildProcess.emit (node:events:513:28)\n    at maybeClose (node:internal/child_process:1098:16)\n    at ChildProcess._handle.onexit (node:internal/child_process:304:5)"
+    }
+  },
+  "2 warn pnpm:global": " Local package.json exists, but node_modules missing, did you mean to install?"
+}

@@ -1,10 +1,5 @@
 import { expect, test, vi } from "vitest";
-import {
-  deepStringReplacement,
-  matchBrackets,
-  trimBrackets,
-  trimChar,
-} from "../src/utils";
+import { deepStringReplacement, matchBrackets } from "../src/utils";
 
 test.each([
   ["hello {input}", { input: "world" }, "hello world"],
@@ -39,14 +34,6 @@ test.each([
   ],
 ])("deepStringReplacement", (inputString, contextObject, expected) => {
   expect(deepStringReplacement(inputString, contextObject)).toBe(expected);
-});
-
-test("trim string with chars", () => {
-  expect(trimChar("aitema", "a")).toBe("item");
-});
-
-test("trim brackets", () => {
-  expect(trimBrackets("{item}")).toBe("item");
 });
 
 test.each([
