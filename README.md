@@ -2,7 +2,13 @@
 
 Small parser that allows including multiple html files in one using an `<include>` tag and a `<for>` tag.
 
-## Exemple
+## Installation
+
+```
+npm i compile-include-html
+```
+
+## Example
 
 ### Simple include
 
@@ -80,16 +86,10 @@ const output = htmlParser.transform(source);
 
 ```html
 <!-- output -->
-`<a href="https://example.com">link to example</a>`
+<a href="https://example.com">link to example</a>
 ```
 
-## HtmlParser
-
-Install with:
-
-```
-npm i compile-include-html
-```
+## Usage
 
 Create a new HtmlParser with:
 
@@ -100,6 +100,8 @@ const htmlParser = new HtmlParser();
 
 ### Options
 
+You can pass an option object to your parser.
+
 ```typescript
 type options = {
   indent?: number;
@@ -109,8 +111,7 @@ type options = {
 };
 ```
 
-- `indent`: You can pass an option object to your includer.
-  You can set the indentation of your generated html with the `indent` property.
+- `indent`: You can set the indentation of your generated html with the `indent` property.
 - `inputIsDocument`: determines whether the input is an entire document with `<DOCTYPE>`, `<head>` and `<body>` tags or just a fragment. It will allow the parser to correctly manage both cases.
 - `globalContext`: allows you to pass a context object to the parser. It will be used to replace values wrapped in `{` and `}`. Brackets values only work on attributes values and text nodes, for example:
 
