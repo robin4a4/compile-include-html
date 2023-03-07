@@ -107,7 +107,6 @@ export class HtmlParser {
       node = this._manageAttributeContextReplacement(manager);
 
       if (node.nodeName === "include") {
-        console.log("======= new include pass ========");
         nodes = this._manageIncludeNode(manager);
       } else if (node.nodeName === "for") {
         nodes = this._manageForNode(manager);

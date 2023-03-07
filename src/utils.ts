@@ -1,18 +1,62 @@
 import { TContext } from "./types";
 
 /**
+ * Given a string containing a dot notation, return the corresponding
+ * value in the context.
+ *
+ * @param {string} dotString
+ * @param {TContext} contextObject
+ * @returns {TContext | any} TODO: figure out how to type this properly with generics
+ */
+export function getContextValueFromDotString(
+  dotString: string,
+  contextObject: TContext
+) {
+  let replacementValue: TContext | any = contextObject;
+  dotString.split(".").forEach((contextKey) => {
+    replacementValue = replacementValue[contextKey];
+  });
+  return replacementValue;
+}
+
+/**
+ * Small variation of getContextValueFromDotString that returns a either a
+ * computed string from the context or the original string.
+ *
+ * @param {string} dotString
+ * @param {TContext} contextObject
+ * @returns {string}
+ */
+export function getReplacementStringFromDotString(
+  dotString: string,
+  contextObject: TContext
+) {
+  const replacementValue = getContextValueFromDotString(
+    dotString,
+    contextObject
+  );
+  return typeof replacementValue === "string" ? replacementValue : dotString;
+}
+
+/**
  * Replace a string containing a bracket expression by the value
  * in the provided context.
  *
+ * It supports ternary expression with a boolean value as a contition.
+ *
  * Example:
- *  - input string: `Hello {foo} {bar.baz}`
+ *  - input string: `Hello {nested.condition ? 'really' : nested.falsy} {foo} {bar.baz}`
  *  - context: {
  *      foo: "strange",
  *      bar: {
  *        baz: "world"
  *      }
+ *      nested: {
+ *       condition: true,
+ *       falsy: "not so"
+ *      }
  *    }
- *  - returns: `Hello strange world`
+ *  - returns: `Hello really strange world`
  *
  * @param {string} inputString
  * @param {TContext} contextObject
@@ -23,16 +67,35 @@ export function deepStringReplacement(
   contextObject: TContext
 ): string {
   matchBrackets(inputString).forEach((valueInBracket) => {
-    let replacementValue = contextObject;
-    valueInBracket.split(".").forEach((contextKey) => {
-      if (typeof replacementValue[contextKey] === "string") {
-        inputString = inputString.replaceAll(
-          `{${valueInBracket}}`,
-          replacementValue[contextKey]
+    let replacementString = `{${valueInBracket}}`;
+    const ternarySplit = valueInBracket.split("?");
+    if (ternarySplit.length === 2) {
+      const condition = ternarySplit[0]?.replaceAll(" ", "");
+      const result = ternarySplit[1]?.replaceAll("'", "").split(":");
+      if (condition && result && result.length === 2) {
+        const contextValue = getContextValueFromDotString(
+          condition,
+          contextObject
         );
+        const truthyValue = result[0]
+          ? getReplacementStringFromDotString(result[0].trim(), contextObject)
+          : "";
+        const falsyValue = result[1]
+          ? getReplacementStringFromDotString(result[1].trim(), contextObject)
+          : "";
+
+        replacementString = Boolean(contextValue) ? truthyValue : falsyValue;
       }
-      replacementValue = replacementValue[contextKey];
-    });
+    } else {
+      replacementString = getReplacementStringFromDotString(
+        valueInBracket,
+        contextObject
+      );
+    }
+    inputString = inputString.replaceAll(
+      `{${valueInBracket}}`,
+      replacementString
+    );
   });
   return inputString;
 }
