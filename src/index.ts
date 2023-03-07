@@ -31,7 +31,9 @@ export class HtmlParser {
    * @returns {string}
    */
   public readFile(path: string): string {
-    return readFileSync(path, { encoding: "utf8" });
+    return readFileSync(`${this.options.basePath}/${path.replace("./", "")}`, {
+      encoding: "utf8",
+    });
   }
 
   /**
@@ -105,9 +107,10 @@ export class HtmlParser {
       node = this._manageAttributeContextReplacement(manager);
 
       if (node.nodeName === "include") {
-        this._manageIncludeNode(manager);
+        console.log("======= new include pass ========");
+        nodes = this._manageIncludeNode(manager);
       } else if (node.nodeName === "for") {
-        this._manageForNode(manager);
+        nodes = this._manageForNode(manager);
       } else if (defaultTreeAdapter.isTextNode(node)) {
         this._manageTextNode(manager);
       } else if (childNodes) {
@@ -144,14 +147,14 @@ export class HtmlParser {
    * Transform an include node into its compiled version recursively.
    *
    * @param {TManager} manager
-   * @returns {void}
+   * @returns {ChildNode[]}
    */
   _manageIncludeNode({ i, nodes, currentNode, depth, context }: TManager) {
-    if (!defaultTreeAdapter.isElementNode(currentNode)) return;
+    if (!defaultTreeAdapter.isElementNode(currentNode)) return nodes;
     const { attrs } = currentNode;
     const srcAttr = attrs.find((attr) => attr.name === "src");
     const contextAttr = attrs.find((attr) => attr.name === "with");
-    if (!srcAttr) return;
+    if (!srcAttr) return nodes;
     // if we try to include a file which includes himself, throw an error
     if (
       this.globalStack.find(
@@ -168,7 +171,8 @@ export class HtmlParser {
     });
 
     // read the file to be included
-    let source = this.readFile(`${this.options.basePath}/${srcAttr.value}`);
+    // let source = this.readFile(`${this.options.basePath}/${srcAttr.value}`);
+    let source = this.readFile(`${srcAttr.value}`);
 
     // parse the context from the attributes
     let localContext = context;
@@ -183,19 +187,20 @@ export class HtmlParser {
 
     // walk the new nodes to be able to include file in an included file recursively
     this._walkTree(newNodes, depth, localContext);
+    return nodes;
   }
 
   /**
    * Transform a for node into its compiled version recursively.
    *
    * @param {TManager} manager
-   * @returns {void}
+   * @returns {ChildNode[]}
    */
   _manageForNode({ i, nodes, currentNode, depth, context }: TManager) {
-    if (!defaultTreeAdapter.isElementNode(currentNode)) return;
+    if (!defaultTreeAdapter.isElementNode(currentNode)) return nodes;
     const { attrs } = currentNode;
     const conditionAttr = attrs.find((attr) => attr.name === "condition");
-    if (!conditionAttr) return;
+    if (!conditionAttr) return nodes;
 
     /*
       Split the condition attribute to retrieve the identifier of the elements to be replaced
@@ -232,6 +237,7 @@ export class HtmlParser {
       // add the multiplied nodes in the tree
       nodes.splice(i, 1, ...newMultipliedNodes);
     }
+    return nodes;
   }
 
   /**
