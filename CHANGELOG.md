@@ -1,5 +1,11 @@
 # compile-include-html
 
+## 2.1.1
+
+### Patch Changes
+
+- fb27408: fix : spliting in ternary
+
 ## 2.1.0
 
 ### Minor Changes
