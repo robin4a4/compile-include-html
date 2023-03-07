@@ -1,5 +1,12 @@
 # compile-include-html
 
+## 2.1.0
+
+### Minor Changes
+
+- b33a7bb: - Add support for ternary expression inside replacement string.
+  - Fix base path.
+
 ## 2.0.0
 
 ### Major Changes
