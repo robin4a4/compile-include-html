@@ -39,7 +39,7 @@ test.each([
     );
   }
 );
-
+const boolean = true;
 test.each([
   ["hello {input}", { input: "world" }, "hello world"],
   [
@@ -100,7 +100,7 @@ test.each([
     "hello {item.boolean ? item.truth : item.lie}",
     {
       item: {
-        boolean: false,
+        boolean: !boolean,
         truth: "world",
         lie: "not world",
       },

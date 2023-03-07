@@ -36,18 +36,18 @@ describe("<for /> tests", () => {
   });
 
   test("for looping in array with deep context", async () => {
-    const input = `<div>\n  <for condition="const user of array"><span>{user.firstName}-{user.lastName}</span></for>\n</div>`;
+    const input = `<div>\n  <for condition="const user of array"><span style="{user.isActive ? 'font-weight: bold' : ''}">{user.firstName}-{user.lastName}</span></for>\n</div>`;
     const parserTest = new HtmlParser({
       indent: 2,
       globalContext: {
         array: [
-          { firstName: "john", lastName: "doe" },
-          { firstName: "jannet", lastName: "foe" },
+          { firstName: "john", lastName: "doe", isActive: true },
+          { firstName: "jannet", lastName: "foe", isActive: false },
         ],
       },
     });
     expect(parserTest.transform(input)).toBe(
-      `<div>\n  <span>john-doe</span><span>jannet-foe</span>\n</div>`
+      `<div>\n  <span style="font-weight: bold">john-doe</span><span style="">jannet-foe</span>\n</div>`
     );
   });
 });

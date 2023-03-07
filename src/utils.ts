@@ -68,10 +68,10 @@ export function deepStringReplacement(
 ): string {
   matchBrackets(inputString).forEach((valueInBracket) => {
     let replacementString = `{${valueInBracket}}`;
-    const ternarySplit = valueInBracket.split("?");
+    const ternarySplit = valueInBracket.split(" ? ");
     if (ternarySplit.length === 2) {
       const condition = ternarySplit[0]?.replaceAll(" ", "");
-      const result = ternarySplit[1]?.replaceAll("'", "").split(":");
+      const result = ternarySplit[1]?.replaceAll("'", "").split(" : ");
       if (condition && result && result.length === 2) {
         const contextValue = getContextValueFromDotString(
           condition,

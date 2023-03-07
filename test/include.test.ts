@@ -44,7 +44,6 @@ describe("<include /> tests", () => {
   test("nested includes", async () => {
     const input = `<include src="card.html" with="text: 'card 1'"></include>`;
     vi.spyOn(HtmlParser.prototype, "readFile").mockImplementation((src) => {
-      console.log(src);
       if (src === "other_card.html") {
         return `<div class="card 2">{text}</div>`;
       }
