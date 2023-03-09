@@ -1,5 +1,11 @@
 # compile-include-html
 
+## 2.2.1
+
+### Patch Changes
+
+- 1d737ce: fix local and global context issue in include tag
+
 ## 2.2.0
 
 ### Minor Changes
