@@ -1,5 +1,11 @@
 # compile-include-html
 
+## 2.2.0
+
+### Minor Changes
+
+- 3aba8cc: add support for many js expression thanks to adding tmpl"
+
 ## 2.1.1
 
 ### Patch Changes
