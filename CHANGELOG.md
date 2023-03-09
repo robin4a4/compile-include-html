@@ -1,5 +1,11 @@
 # compile-include-html
 
+## 2.2.2
+
+### Patch Changes
+
+- 0687115: fix local and global context for for loop
+
 ## 2.2.1
 
 ### Patch Changes
