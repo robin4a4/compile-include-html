@@ -40,6 +40,9 @@ test.each([
   }
 );
 const boolean = true;
+function getColor(status: "success" | "failure") {
+  return status === "success" ? "green" : "red";
+}
 test.each([
   ["hello {input}", { input: "world" }, "hello world"],
   [
@@ -106,6 +109,32 @@ test.each([
       },
     },
     "hello not world",
+  ],
+  [
+    "hello {item.var === 'hello' ? item.truth : item.lie}",
+    {
+      item: {
+        var: "hello",
+        truth: "world",
+        lie: "not world",
+      },
+    },
+    "hello world",
+  ],
+  [
+    "hello {var.toUpperCase()}",
+    {
+      var: "world",
+    },
+    "hello WORLD",
+  ],
+  [
+    "hello {getColor(var)} world",
+    {
+      var: "success",
+      getColor,
+    },
+    "hello green world",
   ],
 ])("deepStringReplacement", (inputString, contextObject, expected) => {
   expect(deepStringReplacement(inputString, contextObject)).toBe(expected);

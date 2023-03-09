@@ -1,5 +1,6 @@
 import { TContext } from "./types";
-
+// @ts-ignore
+import { tmpl } from "riot-tmpl";
 /**
  * Given a string containing a dot notation, return the corresponding
  * value in the context.
@@ -66,38 +67,38 @@ export function deepStringReplacement(
   inputString: string,
   contextObject: TContext
 ): string {
-  matchBrackets(inputString).forEach((valueInBracket) => {
-    let replacementString = `{${valueInBracket}}`;
-    const ternarySplit = valueInBracket.split(" ? ");
-    if (ternarySplit.length === 2) {
-      const condition = ternarySplit[0]?.replaceAll(" ", "");
-      const result = ternarySplit[1]?.replaceAll("'", "").split(" : ");
-      if (condition && result && result.length === 2) {
-        const contextValue = getContextValueFromDotString(
-          condition,
-          contextObject
-        );
-        const truthyValue = result[0]
-          ? getReplacementStringFromDotString(result[0].trim(), contextObject)
-          : "";
-        const falsyValue = result[1]
-          ? getReplacementStringFromDotString(result[1].trim(), contextObject)
-          : "";
+  // matchBrackets(inputString).forEach((valueInBracket) => {
+  //   let replacementString = `{${valueInBracket}}`;
+  //   const ternarySplit = valueInBracket.split(" ? ");
+  //   if (ternarySplit.length === 2) {
+  //     const condition = ternarySplit[0]?.replaceAll(" ", "");
+  //     const result = ternarySplit[1]?.replaceAll("'", "").split(" : ");
+  //     if (condition && result && result.length === 2) {
+  //       const contextValue = getContextValueFromDotString(
+  //         condition,
+  //         contextObject
+  //       );
+  //       const truthyValue = result[0]
+  //         ? getReplacementStringFromDotString(result[0].trim(), contextObject)
+  //         : "";
+  //       const falsyValue = result[1]
+  //         ? getReplacementStringFromDotString(result[1].trim(), contextObject)
+  //         : "";
 
-        replacementString = Boolean(contextValue) ? truthyValue : falsyValue;
-      }
-    } else {
-      replacementString = getReplacementStringFromDotString(
-        valueInBracket,
-        contextObject
-      );
-    }
-    inputString = inputString.replaceAll(
-      `{${valueInBracket}}`,
-      replacementString
-    );
-  });
-  return inputString;
+  //       replacementString = Boolean(contextValue) ? truthyValue : falsyValue;
+  //     }
+  //   } else {
+  //     replacementString = getReplacementStringFromDotString(
+  //       valueInBracket,
+  //       contextObject
+  //     );
+  //   }
+  //   inputString = inputString.replaceAll(
+  //     `{${valueInBracket}}`,
+  //     replacementString
+  //   );
+  // });
+  return tmpl(inputString, contextObject);
 }
 
 /**
@@ -156,8 +157,8 @@ export function parseIncludeContext(
     if (keyFromArray && valueFromArray) {
       const key = keyFromArray.trim().replaceAll(" ", "-");
       const value = valueFromArray.trim();
-      if (currentContext && currentContext[value]) {
-        context[key] = currentContext[value];
+      if (currentContext) {
+        context[key] = deepStringReplacement(`{${value}}`, currentContext);
       } else {
         context[key] = valueFromArray.trim().replaceAll("'", "");
       }

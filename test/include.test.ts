@@ -29,6 +29,46 @@ describe("<include /> tests", () => {
     );
   });
 
+  test("include with global context, reexporting a value", async () => {
+    const input = `<div><include src="card.html" with="linkName: link"></include></div>`;
+    vi.spyOn(HtmlParser.prototype, "readFile").mockImplementation(() => {
+      const card = `<div class="card">{linkName.name}</div>`;
+      return card;
+    });
+
+    const parser = new HtmlParser({
+      globalContext: {
+        link: {
+          href: "https://google.com",
+          name: "Google",
+        },
+      },
+    });
+    expect(parser.transform(input)).toBe(
+      `<div><div class="card">Google</div></div>`
+    );
+  });
+
+  test("include with global context, reexporting a nested value", async () => {
+    const input = `<div><include src="card.html" with="linkName: link.name"></include></div>`;
+    vi.spyOn(HtmlParser.prototype, "readFile").mockImplementation(() => {
+      const card = `<div class="card">{linkName}</div>`;
+      return card;
+    });
+
+    const parser = new HtmlParser({
+      globalContext: {
+        link: {
+          href: "https://google.com",
+          name: "Google",
+        },
+      },
+    });
+    expect(parser.transform(input)).toBe(
+      `<div><div class="card">Google</div></div>`
+    );
+  });
+
   test("simple include with indentation", async () => {
     const input = `<div>\n    <include src="card.html" with="text: 'hello world'"></include>\n</div>`;
     vi.spyOn(HtmlParser.prototype, "readFile").mockImplementation(() => {

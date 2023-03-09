@@ -4,12 +4,14 @@ specifiers:
   '@changesets/cli': ^2.26.0
   '@types/node': ^18.11.18
   parse5: ^7.1.2
+  riot-tmpl: ^3.0.8
   tsup: ^6.5.0
   typescript: ^4.9.4
   vitest: ^0.27.3
 
 dependencies:
   parse5: 7.1.2
+  riot-tmpl: 3.0.8
   tsup: 6.5.0_typescript@4.9.4
 
 devDependencies:
@@ -1217,6 +1219,10 @@ packages:
     engines: {node: '>=0.8.0'}
     dev: true
 
+  /eslint-config-riot/1.0.0:
+    resolution: {integrity: sha512-NB/L/1Y30qyJcG5xZxCJKW/+bqyj+llbcCwo9DEz8bESIP0SLTOQ8T1DWCCFc+wJ61AMEstj4511PSScqMMfCw==}
+    dev: false
+
   /esprima/4.0.1:
     resolution: {integrity: sha512-eGuFFw7Upda+g4p+QHvnW0RyTX/SVeJBDM/gCtMARO0cLuT2HcEKnTPvhjV6aGeqrCB/sbNop0Kszm0jsaWU4A==}
     engines: {node: '>=4'}
@@ -2223,6 +2229,12 @@ packages:
     resolution: {integrity: sha512-U9nH88a3fc/ekCF1l0/UP1IosiuIjyTh7hBvXVMHYgVcfGvt897Xguj2UOLDeI5BG2m7/uwyaLVT6fbtCwTyzw==}
     engines: {iojs: '>=1.0.0', node: '>=0.10.0'}
 
+  /riot-tmpl/3.0.8:
+    resolution: {integrity: sha512-ngv48VQ58LMtuNrXnELxODsRUJ3NxcGQkL2yJPj5cy8WAgGgK+rarEFwfLoRdAfh76ipWiPrYL4nZ2nfW87lJw==}
+    dependencies:
+      eslint-config-riot: 1.0.0
+    dev: false
+
   /rollup/3.10.1:
     resolution: {integrity: sha512-3Er+yel3bZbZX1g2kjVM+FW+RUWDxbG87fcqFM5/9HbPCTpbVp6JOLn7jlxnNlbu7s/N/uDA4EV/91E2gWnxzw==}
     engines: {node: '>=14.18.0', npm: '>=8.0.0'}
@@ -2617,6 +2629,7 @@ packages:
     resolution: {integrity: sha512-Uz+dTXYzxXXbsFpM86Wh3dKCxrQqUcVMxwU54orwlJjOpO3ao8L7j5lH+dWfTwgCwIuM9GQ2kvVotzYJMXTBZg==}
     engines: {node: '>=4.2.0'}
     hasBin: true
+    dev: true
 
   /ufo/1.0.1:
     resolution: {integrity: sha512-boAm74ubXHY7KJQZLlXrtMz52qFvpsbOxDcZOnw/Wf+LS4Mmyu7JxmzD4tDLtUQtmZECypJ0FrCz4QIe6dvKRA==}
