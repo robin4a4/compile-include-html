@@ -229,7 +229,7 @@ export class HtmlParser {
           - for first loop count `const localContext = {item: 'a'}`
           - for second loop count `const localContext = {item: 'b'}`
         */
-        const localContext = { [identifier]: conditionContextItem };
+        const localContext = { ...context, [identifier]: conditionContextItem };
         this._walkTree(newLocalNodes, depth, localContext);
         newMultipliedNodes.push(...newLocalNodes);
       });

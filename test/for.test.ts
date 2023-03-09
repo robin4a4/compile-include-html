@@ -50,4 +50,15 @@ describe("<for /> tests", () => {
       `<div>\n  <span style="font-weight: bold">john-doe</span><span style="">jannet-foe</span>\n</div>`
     );
   });
+  test("keep global context", async () => {
+    const input = `<for condition="const user of array">{user.firstName}-{globalStuff}</for>`;
+    const parserTest = new HtmlParser({
+      indent: 2,
+      globalContext: {
+        globalStuff: "global",
+        array: [{ firstName: "john" }, { firstName: "jannet" }],
+      },
+    });
+    expect(parserTest.transform(input)).toBe(`john-globaljannet-global`);
+  });
 });
