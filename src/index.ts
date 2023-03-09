@@ -12,6 +12,7 @@ export class HtmlParser {
     fileName: string;
     depth: number;
   }[];
+  previousItemDepth: number = 0;
 
   constructor(options?: Partial<TOptions>) {
     this.options = {
@@ -69,6 +70,14 @@ export class HtmlParser {
     this._writeFile(outputPath, content);
   }
 
+  _recomputeBasePath(inputPath: string) {
+    const splitPath = inputPath.split("/");
+    if (splitPath.length > 1) {
+      const inputWithoutFileName = splitPath.slice(0, -1).join("/");
+      this.options.basePath = `${this.options.basePath}/${inputWithoutFileName}`;
+    }
+  }
+
   /**
    * Write a file.
    *
@@ -113,6 +122,7 @@ export class HtmlParser {
       } else if (defaultTreeAdapter.isTextNode(node)) {
         this._manageTextNode(manager);
       } else if (childNodes) {
+        this.previousItemDepth = this.previousItemDepth + 1;
         this._walkTree(childNodes, depth + 1, context);
       }
       i++;
@@ -168,10 +178,11 @@ export class HtmlParser {
       fileName: srcAttr.value,
       depth: depth,
     });
-
     // read the file to be included
     // let source = this.readFile(`${this.options.basePath}/${srcAttr.value}`);
     let source = this.readFile(`${srcAttr.value}`);
+    if (this.previousItemDepth > depth && srcAttr.value)
+      this._recomputeBasePath(srcAttr.value);
 
     // parse the context from the attributes
     let localContext = context;
@@ -183,7 +194,6 @@ export class HtmlParser {
 
     // replaces the node with the new node in place
     nodes.splice(i, 1, ...newNodes);
-
     // walk the new nodes to be able to include file in an included file recursively
     this._walkTree(newNodes, depth, localContext);
     return nodes;

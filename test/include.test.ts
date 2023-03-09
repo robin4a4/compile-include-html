@@ -108,6 +108,23 @@ describe("<include /> tests", () => {
     );
   });
 
+  test("double nested includes", async () => {
+    const input = `<include src="card.html" with="text: 'card 1'"></include>`;
+    vi.spyOn(HtmlParser.prototype, "readFile").mockImplementation((src) => {
+      if (src === "other_card.html") {
+        return `<include src="final_card.html" with="text: 'final'"></include>`;
+      }
+      if (src === "final_card.html") {
+        return `<div>{text}</div>`;
+      }
+      return `<div class="card">{text} <include src="other_card.html"></include></div>`;
+    });
+    const parserTest = new HtmlParser();
+    expect(parserTest.transform(input)).toBe(
+      `<div class="card">card 1 <div>final</div></div>`
+    );
+  });
+
   test("double include with indentation", async () => {
     const input = `<div>\n    <include src="card.html" with="text: 'hello world'"></include>\n    <include src="card.html" with="text: 'hello world'"></include>\n</div>`;
     vi.spyOn(HtmlParser.prototype, "readFile").mockImplementation(() => {
