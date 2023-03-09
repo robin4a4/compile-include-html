@@ -28,7 +28,20 @@ describe("<include /> tests", () => {
       `<div><div class="card">hello world</div></div>`
     );
   });
+  test("simple include with global context and local context", async () => {
+    const input = `<div><include src="card.html" with="local: 'local'"></include></div>`;
+    vi.spyOn(HtmlParser.prototype, "readFile").mockImplementation(() => {
+      const card = `<div class="card">{local} {test}</div>`;
+      return card;
+    });
 
+    const parser = new HtmlParser({
+      globalContext: { test: "global" },
+    });
+    expect(parser.transform(input)).toBe(
+      `<div><div class="card">local global</div></div>`
+    );
+  });
   test("include with global context, reexporting a value", async () => {
     const input = `<div><include src="card.html" with="linkName: link"></include></div>`;
     vi.spyOn(HtmlParser.prototype, "readFile").mockImplementation(() => {

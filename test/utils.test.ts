@@ -1,44 +1,6 @@
-import { expect, test, vi } from "vitest";
-import {
-  deepStringReplacement,
-  getContextValueFromDotString,
-  matchBrackets,
-} from "../src/utils";
+import { expect, test } from "vitest";
+import { deepStringReplacement, matchBrackets } from "../src/utils";
 
-test.each([
-  ["input", { input: "hello world" }, "hello world"],
-  [
-    "input.firstKey",
-    {
-      input: {
-        firstKey: 2,
-      },
-    },
-    2,
-  ],
-  [
-    "input.firstKey.secondKey.thirdKey.fourthKey",
-    {
-      input: {
-        firstKey: {
-          secondKey: {
-            thirdKey: {
-              fourthKey: "hello world",
-            },
-          },
-        },
-      },
-    },
-    "hello world",
-  ],
-])(
-  "getReplacementStringFromDotString",
-  (dotString, contextObject, expected) => {
-    expect(getContextValueFromDotString(dotString, contextObject)).toBe(
-      expected
-    );
-  }
-);
 const boolean = true;
 function getColor(status: "success" | "failure") {
   return status === "success" ? "green" : "red";
@@ -132,6 +94,14 @@ test.each([
     "hello {getColor(var)} world",
     {
       var: "success",
+      getColor,
+    },
+    "hello green world",
+  ],
+  [
+    "hello {getColor(var.nestedVar)} world",
+    {
+      var: { nestedVar: "success" },
       getColor,
     },
     "hello green world",
