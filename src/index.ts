@@ -31,7 +31,7 @@ export class HtmlParser {
    * @returns {string}
    */
   public readFile(path: string): string {
-    return readFileSync(`${this.options.basePath}/${path.replace("./", "")}`, {
+    return readFileSync(`${this.options.basePath}/${path}`, {
       encoding: "utf8",
     });
   }
