@@ -1,5 +1,11 @@
 # compile-include-html
 
+## 2.2.3
+
+### Patch Changes
+
+- d8a7e58: fix external folder path
+
 ## 2.2.2
 
 ### Patch Changes
