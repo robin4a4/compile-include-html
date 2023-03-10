@@ -1,5 +1,11 @@
 # compile-include-html
 
+## 2.2.5
+
+### Patch Changes
+
+- 56eaf8c: add includeDepth
+
 ## 2.2.4
 
 ### Patch Changes
