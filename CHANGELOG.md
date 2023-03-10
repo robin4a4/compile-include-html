@@ -1,5 +1,11 @@
 # compile-include-html
 
+## 2.2.4
+
+### Patch Changes
+
+- a2935a5: add recompute path
+
 ## 2.2.3
 
 ### Patch Changes
