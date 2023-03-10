@@ -12,7 +12,7 @@ export class HtmlParser {
     fileName: string;
     depth: number;
   }[];
-  previousItemDepth: number = 0;
+  previousIncludeDepth: number = 0;
 
   constructor(options?: Partial<TOptions>) {
     this.options = {
@@ -53,7 +53,8 @@ export class HtmlParser {
     const tags = parser(source);
     const nodes = tags.childNodes;
     const depth = 0;
-    this._walkTree(nodes, depth, this.options.globalContext);
+    const includeDepth = 0;
+    this._walkTree(nodes, depth, includeDepth, this.options.globalContext);
     tags.childNodes = nodes;
     return serialize(tags);
   }
@@ -104,6 +105,7 @@ export class HtmlParser {
   _walkTree(
     nodes: ChildNode[],
     depth: number,
+    includeDepth: number,
     context: TContext | null = null
   ) {
     let i = 0;
@@ -111,7 +113,14 @@ export class HtmlParser {
       const childNodes = (node as ChildNode & { childNodes: ChildNode[] })
         .childNodes; // for some reason typescript cannot see that there is, in fact, a childNode property to ChildNode
 
-      const manager: TManager = { i, nodes, currentNode: node, depth, context };
+      const manager: TManager = {
+        i,
+        nodes,
+        currentNode: node,
+        depth,
+        includeDepth,
+        context,
+      };
 
       node = this._manageAttributeContextReplacement(manager);
 
@@ -122,8 +131,7 @@ export class HtmlParser {
       } else if (defaultTreeAdapter.isTextNode(node)) {
         this._manageTextNode(manager);
       } else if (childNodes) {
-        this.previousItemDepth = this.previousItemDepth + 1;
-        this._walkTree(childNodes, depth + 1, context);
+        this._walkTree(childNodes, depth + 1, includeDepth, context);
       }
       i++;
     });
@@ -158,7 +166,14 @@ export class HtmlParser {
    * @param {TManager} manager
    * @returns {ChildNode[]}
    */
-  _manageIncludeNode({ i, nodes, currentNode, depth, context }: TManager) {
+  _manageIncludeNode({
+    i,
+    nodes,
+    currentNode,
+    depth,
+    includeDepth,
+    context,
+  }: TManager) {
     if (!defaultTreeAdapter.isElementNode(currentNode)) return nodes;
     const { attrs } = currentNode;
     const srcAttr = attrs.find((attr) => attr.name === "src");
@@ -191,7 +206,7 @@ export class HtmlParser {
           sibling file "button.html" in components we want to do in card.html
           <include src="button.html"></include> instead of <include src="components/button.html"></include>
     */
-    if (this.previousItemDepth > depth && srcAttr.value)
+    if (this.previousIncludeDepth >= includeDepth && srcAttr.value)
       this._recomputeBasePath(srcAttr.value);
 
     // parse the context from the attributes
@@ -205,7 +220,8 @@ export class HtmlParser {
     // replaces the node with the new node in place
     nodes.splice(i, 1, ...newNodes);
     // walk the new nodes to be able to include file in an included file recursively
-    this._walkTree(newNodes, depth, localContext);
+    this._walkTree(newNodes, depth, includeDepth + 1, localContext);
+    this.previousIncludeDepth = this.previousIncludeDepth + 1;
     return nodes;
   }
 
@@ -215,7 +231,14 @@ export class HtmlParser {
    * @param {TManager} manager
    * @returns {ChildNode[]}
    */
-  _manageForNode({ i, nodes, currentNode, depth, context }: TManager) {
+  _manageForNode({
+    i,
+    nodes,
+    currentNode,
+    depth,
+    includeDepth,
+    context,
+  }: TManager) {
     if (!defaultTreeAdapter.isElementNode(currentNode)) return nodes;
     const { attrs } = currentNode;
     const conditionAttr = attrs.find((attr) => attr.name === "condition");
@@ -250,7 +273,7 @@ export class HtmlParser {
           - for second loop count `const localContext = {item: 'b'}`
         */
         const localContext = { ...context, [identifier]: conditionContextItem };
-        this._walkTree(newLocalNodes, depth, localContext);
+        this._walkTree(newLocalNodes, depth, includeDepth, localContext);
         newMultipliedNodes.push(...newLocalNodes);
       });
       // add the multiplied nodes in the tree
