@@ -181,6 +181,16 @@ export class HtmlParser {
     // read the file to be included
     // let source = this.readFile(`${this.options.basePath}/${srcAttr.value}`);
     let source = this.readFile(`${srcAttr.value}`);
+
+    /* 
+      if the walker is going back to a previous depth (meaning it finished with the current nested include and came back to the root),
+      we need to recompute the base path to be able to use relative imports in the src attribute
+      
+      Example:
+          if a file includes a "card.html" file in a subfolder "components", and card.html includes a
+          sibling file "button.html" in components we want to do in card.html
+          <include src="button.html"></include> instead of <include src="components/button.html"></include>
+    */
     if (this.previousItemDepth > depth && srcAttr.value)
       this._recomputeBasePath(srcAttr.value);
 
