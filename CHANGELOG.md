@@ -1,5 +1,11 @@
 # compile-include-html
 
+## 2.2.6
+
+### Patch Changes
+
+- dc4e750: return the original string if tmpl does not manage to parse
+
 ## 2.2.5
 
 ### Patch Changes
