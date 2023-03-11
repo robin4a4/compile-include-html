@@ -1,5 +1,11 @@
 # compile-include-html
 
+## 2.2.7
+
+### Patch Changes
+
+- 2eee487: add error handling tmpl
+
 ## 2.2.6
 
 ### Patch Changes
