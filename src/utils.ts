@@ -30,9 +30,16 @@ export function deepStringReplacement(
   inputString: string,
   contextObject: TContext
 ): string {
-  const computedString = tmpl(inputString, contextObject);
-  if (computedString === undefined) return inputString;
-  return computedString;
+  tmpl.errorHandler = (err: any) => {
+    throw new Error(err);
+  };
+  try {
+    const computedString = tmpl(inputString, contextObject);
+    if (computedString === undefined) return inputString;
+    return computedString;
+  } catch {
+    return inputString;
+  }
 }
 
 /**

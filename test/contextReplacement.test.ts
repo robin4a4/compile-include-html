@@ -17,14 +17,14 @@ describe("context replacement tests", () => {
     );
   });
   test("failed context replacement in text node", async () => {
-    const input = `<ul><li>{firstLi}</li><li>{secondLi.nested}</li><li>{undefinedFunction()}</li></ul>`;
+    const input = `<ul><li>{firstLi}</li><li>{secondLi.nested}</li><li>undefinedFunction should remain in brackets: {undefinedFunction()}</li></ul>`;
     const parser = new HtmlParser({
       globalContext: {
         firstLi: "hello",
       },
     });
     expect(parser.transform(input)).toBe(
-      `<ul><li>hello</li><li>{secondLi.nested}</li><li>{undefinedFunction()}</li></ul>`
+      `<ul><li>hello</li><li>{secondLi.nested}</li><li>undefinedFunction should remain in brackets: {undefinedFunction()}</li></ul>`
     );
   });
 
