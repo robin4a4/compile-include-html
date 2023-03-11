@@ -30,7 +30,9 @@ export function deepStringReplacement(
   inputString: string,
   contextObject: TContext
 ): string {
-  return tmpl(inputString, contextObject);
+  const computedString = tmpl(inputString, contextObject);
+  if (computedString === undefined) return inputString;
+  return computedString;
 }
 
 /**

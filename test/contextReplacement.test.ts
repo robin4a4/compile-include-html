@@ -16,6 +16,17 @@ describe("context replacement tests", () => {
       `<ul><li>hello</li><li>world</li></ul>`
     );
   });
+  test("failed context replacement in text node", async () => {
+    const input = `<ul><li>{firstLi}</li><li>{secondLi.nested}</li><li>{undefinedFunction()}</li></ul>`;
+    const parser = new HtmlParser({
+      globalContext: {
+        firstLi: "hello",
+      },
+    });
+    expect(parser.transform(input)).toBe(
+      `<ul><li>hello</li><li>{secondLi.nested}</li><li>{undefinedFunction()}</li></ul>`
+    );
+  });
 
   test("context replacement in node attributes", async () => {
     const input = `<a href="{link.href}">{link.name}</a>`;
