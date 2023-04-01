@@ -328,3 +328,5 @@ export class HtmlParser {
     }
   }
 }
+
+export { ExperimentalCompileIncludePlugin } from "./vite-plugin-compile-include";
