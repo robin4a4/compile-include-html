@@ -2,7 +2,7 @@
   "name": "compile-include-html",
   "license": "MIT",
   "author": "Robin Marillia",
-  "version": "2.2.8",
+  "version": "2.2.9",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",

@@ -1,5 +1,11 @@
 # compile-include-html
 
+## 2.2.9
+
+### Patch Changes
+
+- ec4c54e: add isAbsolutePath
+
 ## 2.2.8
 
 ### Patch Changes
