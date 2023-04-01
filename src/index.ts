@@ -20,6 +20,7 @@ export class HtmlParser {
       indent: options?.indent || 4,
       inputIsDocument: options?.inputIsDocument || false,
       basePath: options?.basePath || ".",
+      variableReplacements: options?.variableReplacements || null,
     };
     this.INDENT = " ".repeat(this.options.indent);
     this.globalStack = [];
@@ -292,7 +293,11 @@ export class HtmlParser {
   _manageTextNode({ currentNode, depth, context }: TManager) {
     if (!defaultTreeAdapter.isTextNode(currentNode)) return;
     if (context) {
-      currentNode.value = deepStringReplacement(currentNode.value, context);
+      currentNode.value = deepStringReplacement(
+        currentNode.value,
+        context,
+        depth <= 1 ? this.options.variableReplacements : null
+      );
     }
     if (depth > 0) {
       currentNode.value = currentNode.value.replaceAll(

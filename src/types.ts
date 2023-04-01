@@ -5,6 +5,7 @@ export type TOptions = {
   indent: number;
   inputIsDocument: boolean;
   basePath: string;
+  variableReplacements: Record<string, string> | null;
 };
 
 export type TContext = Record<string, any>;

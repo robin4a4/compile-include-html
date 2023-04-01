@@ -1,4 +1,4 @@
-import { TContext } from "./types";
+import { TContext, TOptions } from "./types";
 // @ts-ignore
 import { tmpl } from "riot-tmpl";
 
@@ -28,12 +28,19 @@ import { tmpl } from "riot-tmpl";
  */
 export function deepStringReplacement(
   inputString: string,
-  contextObject: TContext
+  contextObject: TContext,
+  variableReplacements?: TOptions["variableReplacements"]
 ): string {
   tmpl.errorHandler = (err: any) => {
     throw new Error(err);
   };
   try {
+    if (variableReplacements) {
+      Object.entries(variableReplacements || {}).forEach(([key, value]) => {
+        inputString = inputString.replace(new RegExp(key, "g"), value);
+      });
+    }
+
     const computedString = tmpl(inputString, contextObject);
     if (computedString === undefined) return inputString;
     return computedString;

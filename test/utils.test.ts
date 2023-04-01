@@ -111,6 +111,42 @@ test.each([
 });
 
 test.each([
+  [
+    "hello {input}",
+    { newInput: "world" },
+    {
+      input: "newInput",
+    },
+    "hello world",
+  ],
+  [
+    "hello {input.firstKey.secondKey.thirdKey.fourthKey}",
+    {
+      newInput: {
+        firstKey: {
+          secondKey: {
+            thirdKey: {
+              fourthKey: "world",
+            },
+          },
+        },
+      },
+    },
+    {
+      input: "newInput",
+    },
+    "hello world",
+  ],
+])(
+  "deepStringReplacement with text replacement",
+  (inputString, contextObject, variableReplacements, expected) => {
+    expect(
+      deepStringReplacement(inputString, contextObject, variableReplacements)
+    ).toBe(expected);
+  }
+);
+
+test.each([
   ["{item}", ["item"]],
   ["lorem {item1} ipsum {item2}", ["item1", "item2"]],
 ])("match brackets group", (inputString, expected) => {

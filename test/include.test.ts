@@ -14,6 +14,7 @@ describe("<include /> tests", () => {
       `<div><div class="card">hello world</div></div>`
     );
   });
+
   test("simple include with global context", async () => {
     const input = `<div><include src="card.html"></include></div>`;
     vi.spyOn(HtmlParser.prototype, "readFile").mockImplementation(() => {
@@ -28,6 +29,47 @@ describe("<include /> tests", () => {
       `<div><div class="card">hello world</div></div>`
     );
   });
+
+  test("include with complex variable name replacement only", async () => {
+    const input = `<div><include src="card.html"></include>{helloVar.key}</div>`;
+    vi.spyOn(HtmlParser.prototype, "readFile").mockImplementation(() => {
+      const card = `<div class="card">{text.key1.key2}</div>`;
+      return card;
+    });
+    const parser = new HtmlParser({
+      variableReplacements: {
+        helloVar: "newHelloVar",
+        text: "newText",
+      },
+    });
+    expect(parser.transform(input)).toBe(
+      `<div><div class="card">{text.key1.key2}</div>{newHelloVar.key}</div>`
+    );
+  });
+
+  test("include with complex variable name replacement + context", async () => {
+    const input = `<div><include src="card.html"></include>{helloVar}</div>`;
+    vi.spyOn(HtmlParser.prototype, "readFile").mockImplementation(() => {
+      const card = `<div class="card">{text}</div>`;
+      return card;
+    });
+    const parser = new HtmlParser({
+      globalContext: {
+        text: "text should be used",
+        newText: "newText should not be used",
+        helloVar: "helloVar should not be used",
+        newHelloVar: "newHelloVar should be used",
+      },
+      variableReplacements: {
+        helloVar: "newHelloVar",
+        text: "newText",
+      },
+    });
+    expect(parser.transform(input)).toBe(
+      `<div><div class="card">text should be used</div>newHelloVar should be used</div>`
+    );
+  });
+
   test("simple include with global context and local context", async () => {
     const input = `<div><include src="card.html" with="local: 'local'"></include></div>`;
     vi.spyOn(HtmlParser.prototype, "readFile").mockImplementation(() => {
