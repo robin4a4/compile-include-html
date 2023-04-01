@@ -1,5 +1,11 @@
 # compile-include-html
 
+## 2.2.12
+
+### Patch Changes
+
+- 639ed30: add new replaceByTemplateLitterals option
+
 ## 2.2.11
 
 ### Patch Changes
