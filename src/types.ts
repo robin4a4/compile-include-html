@@ -6,6 +6,7 @@ export type TOptions = {
   inputIsDocument: boolean;
   basePath: string;
   variableReplacements: Record<string, string> | null;
+  isAbsolutePath: boolean;
 };
 
 export type TContext = Record<string, any>;

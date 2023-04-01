@@ -20,6 +20,7 @@ export class HtmlParser {
       indent: options?.indent || 4,
       inputIsDocument: options?.inputIsDocument || false,
       basePath: options?.basePath || ".",
+      isAbsolutePath: options?.isAbsolutePath || false,
       variableReplacements: options?.variableReplacements || null,
     };
     this.INDENT = " ".repeat(this.options.indent);
@@ -33,7 +34,10 @@ export class HtmlParser {
    * @returns {string}
    */
   public readFile(path: string): string {
-    return readFileSync(`${this.options.basePath}/${path}`, {
+    const filePath = this.options.isAbsolutePath
+      ? path
+      : `${this.options.basePath}/${path}`;
+    return readFileSync(filePath, {
       encoding: "utf8",
     });
   }
