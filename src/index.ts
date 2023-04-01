@@ -24,6 +24,7 @@ export class HtmlParser {
       basePath: options?.basePath || ".",
       isAbsolutePath: options?.isAbsolutePath || false,
       variableReplacements: options?.variableReplacements || null,
+      replaceByTemplateLitterals: options?.replaceByTemplateLitterals || false,
     };
     this.INDENT = " ".repeat(this.options.indent);
     this.globalStack = [];
@@ -174,7 +175,8 @@ export class HtmlParser {
       attr.value = deepStringReplacement(
         attr.value,
         context,
-        depth <= 1 ? this.options.variableReplacements : null
+        depth <= 1 ? this.options.variableReplacements : null,
+        this.options.replaceByTemplateLitterals
       );
       return attr;
     });
@@ -315,7 +317,8 @@ export class HtmlParser {
     currentNode.value = deepStringReplacement(
       currentNode.value,
       context,
-      includeDepth === 0 ? this.options.variableReplacements : null
+      includeDepth === 0 ? this.options.variableReplacements : null,
+      this.options.replaceByTemplateLitterals
     );
     if (depth > 0) {
       currentNode.value = currentNode.value.replaceAll(

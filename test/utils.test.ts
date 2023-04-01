@@ -149,6 +149,57 @@ test.each([
 );
 
 test.each([
+  [
+    "hello {input} {link.test}",
+    null,
+    {
+      input: "newInput",
+      link: "ev.detail",
+    },
+    true,
+    "hello ${input} ${ev.detail.test}",
+  ],
+  [
+    "hello {input.firstKey.secondKey.thirdKey.fourthKey}",
+    {
+      newInput: {
+        firstKey: {
+          secondKey: {
+            thirdKey: {
+              fourthKey: "world",
+            },
+          },
+        },
+      },
+    },
+    {
+      input: "newInput",
+    },
+    true,
+    "hello ${newInput.firstKey.secondKey.thirdKey.fourthKey}",
+  ],
+])(
+  "deepStringReplacement with template litterals",
+  (
+    inputString,
+    contextObject,
+    variableReplacements,
+    replaceByTemplateLitterals,
+    expected
+  ) => {
+    expect(
+      deepStringReplacement(
+        inputString,
+        // @ts-ignore
+        contextObject,
+        variableReplacements,
+        replaceByTemplateLitterals
+      )
+    ).toBe(expected);
+  }
+);
+
+test.each([
   ["{item}", ["item"]],
   ["lorem {item1} ipsum {item2}", ["item1", "item2"]],
 ])("match brackets group", (inputString, expected) => {

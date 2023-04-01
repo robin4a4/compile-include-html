@@ -2,6 +2,11 @@ import { TContext, TOptions } from "./types";
 // @ts-ignore
 import { tmpl } from "riot-tmpl";
 
+function addDollarBeforeBracket(s: string): string {
+  const regex = /({.+?})/g;
+  return s.replaceAll(regex, (match) => `$${match}`);
+}
+
 /**
  * Replace a string containing a bracket expression by the value
  * in the provided context.
@@ -29,7 +34,8 @@ import { tmpl } from "riot-tmpl";
 export function deepStringReplacement(
   inputString: string,
   contextObject: TContext,
-  variableReplacements?: TOptions["variableReplacements"]
+  variableReplacements?: TOptions["variableReplacements"],
+  replaceByTemplateLitterals = false
 ): string {
   tmpl.errorHandler = (err: any) => {
     throw new Error(err);
@@ -40,9 +46,12 @@ export function deepStringReplacement(
         inputString = inputString.replaceAll(`${key}.`, `${value}.`);
       });
     }
-
+    if (replaceByTemplateLitterals) {
+      return addDollarBeforeBracket(inputString);
+    }
     const computedString = tmpl(inputString, contextObject);
     if (computedString === undefined) return inputString;
+
     return computedString;
   } catch {
     return inputString;
