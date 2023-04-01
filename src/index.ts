@@ -13,6 +13,8 @@ export class HtmlParser {
     depth: number;
   }[];
   previousIncludeDepth: number = 0;
+  computedBasePath: string;
+  readFileCount = 0;
 
   constructor(options?: Partial<TOptions>) {
     this.options = {
@@ -25,6 +27,7 @@ export class HtmlParser {
     };
     this.INDENT = " ".repeat(this.options.indent);
     this.globalStack = [];
+    this.computedBasePath = this.options.basePath;
   }
 
   /**
@@ -36,7 +39,12 @@ export class HtmlParser {
   public readFile(path: string): string {
     const filePath = this.options.isAbsolutePath
       ? path
-      : `${this.options.basePath}/${path}`;
+      : `${this.computedBasePath}/${path}`;
+
+    if (this.readFileCount === 0) {
+      this._recomputeBasePath(path);
+    }
+    this.readFileCount += 1;
     return readFileSync(filePath, {
       encoding: "utf8",
     });
@@ -80,7 +88,7 @@ export class HtmlParser {
     const splitPath = inputPath.split("/");
     if (splitPath.length > 1) {
       const inputWithoutFileName = splitPath.slice(0, -1).join("/");
-      this.options.basePath = `${this.options.basePath}/${inputWithoutFileName}`;
+      this.computedBasePath = `${this.computedBasePath}/${inputWithoutFileName}`;
     }
   }
 
