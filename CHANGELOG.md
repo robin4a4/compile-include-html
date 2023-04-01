@@ -1,5 +1,11 @@
 # compile-include-html
 
+## 2.2.8
+
+### Patch Changes
+
+- 709aadd: add variableReplacements
+
 ## 2.2.7
 
 ### Patch Changes
