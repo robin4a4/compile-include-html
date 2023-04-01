@@ -1,5 +1,11 @@
 # compile-include-html
 
+## 2.2.11
+
+### Patch Changes
+
+- 373ee74: fix variableReplacement
+
 ## 2.2.10
 
 ### Patch Changes
