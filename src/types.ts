@@ -17,5 +17,5 @@ export type TManager = {
   currentNode: ChildNode;
   depth: number;
   includeDepth: number;
-  context: TContext | null;
+  context: TContext;
 };

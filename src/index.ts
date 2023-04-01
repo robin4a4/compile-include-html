@@ -119,7 +119,7 @@ export class HtmlParser {
     nodes: ChildNode[],
     depth: number,
     includeDepth: number,
-    context: TContext | null = null
+    context: TContext
   ) {
     let i = 0;
     nodes?.forEach((node) => {
@@ -162,12 +162,20 @@ export class HtmlParser {
    * @param {TManager} manager
    * @returns {Element}
    */
-  _manageAttributeContextReplacement({ currentNode, context }: TManager) {
+  _manageAttributeContextReplacement({
+    currentNode,
+    context,
+    depth,
+  }: TManager) {
     if (!defaultTreeAdapter.isElementNode(currentNode) || !context)
       return currentNode;
     const { attrs } = currentNode;
     currentNode.attrs = attrs.map((attr) => {
-      attr.value = deepStringReplacement(attr.value, context);
+      attr.value = deepStringReplacement(
+        attr.value,
+        context,
+        depth <= 1 ? this.options.variableReplacements : null
+      );
       return attr;
     });
     return currentNode;
@@ -302,15 +310,13 @@ export class HtmlParser {
    * @param {TManager} manager
    * @returns {void}
    */
-  _manageTextNode({ currentNode, depth, context }: TManager) {
+  _manageTextNode({ currentNode, depth, includeDepth, context }: TManager) {
     if (!defaultTreeAdapter.isTextNode(currentNode)) return;
-    if (context) {
-      currentNode.value = deepStringReplacement(
-        currentNode.value,
-        context,
-        depth <= 1 ? this.options.variableReplacements : null
-      );
-    }
+    currentNode.value = deepStringReplacement(
+      currentNode.value,
+      context,
+      includeDepth === 0 ? this.options.variableReplacements : null
+    );
     if (depth > 0) {
       currentNode.value = currentNode.value.replaceAll(
         "\n",

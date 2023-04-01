@@ -37,7 +37,7 @@ export function deepStringReplacement(
   try {
     if (variableReplacements) {
       Object.entries(variableReplacements || {}).forEach(([key, value]) => {
-        inputString = inputString.replace(new RegExp(key, "g"), value);
+        inputString = inputString.replaceAll(`${key}.`, `${value}.`);
       });
     }
 

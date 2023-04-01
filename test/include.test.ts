@@ -48,7 +48,7 @@ describe("<include /> tests", () => {
   });
 
   test("include with complex variable name replacement + context", async () => {
-    const input = `<div><include src="card.html"></include>{helloVar}</div>`;
+    const input = `<div><include src="card.html"></include>{helloVar.text}</div>`;
     vi.spyOn(HtmlParser.prototype, "readFile").mockImplementation(() => {
       const card = `<div class="card">{text}</div>`;
       return card;
@@ -57,8 +57,8 @@ describe("<include /> tests", () => {
       globalContext: {
         text: "text should be used",
         newText: "newText should not be used",
-        helloVar: "helloVar should not be used",
-        newHelloVar: "newHelloVar should be used",
+        helloVar: { text: "helloVar should not be used" },
+        newHelloVar: { text: "newHelloVar should be used" },
       },
       variableReplacements: {
         helloVar: "newHelloVar",

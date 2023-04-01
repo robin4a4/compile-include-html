@@ -112,12 +112,13 @@ test.each([
 
 test.each([
   [
-    "hello {input}",
-    { newInput: "world" },
+    "hello {input} {link.test}",
+    null,
     {
       input: "newInput",
+      link: "ev.detail",
     },
-    "hello world",
+    "hello {input} {ev.detail.test}",
   ],
   [
     "hello {input.firstKey.secondKey.thirdKey.fourthKey}",
@@ -141,6 +142,7 @@ test.each([
   "deepStringReplacement with text replacement",
   (inputString, contextObject, variableReplacements, expected) => {
     expect(
+      // @ts-ignore
       deepStringReplacement(inputString, contextObject, variableReplacements)
     ).toBe(expected);
   }
