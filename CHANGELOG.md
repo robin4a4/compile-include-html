@@ -1,5 +1,11 @@
 # compile-include-html
 
+## 2.2.10
+
+### Patch Changes
+
+- ac82851: fix recomputebasePath for entry
+
 ## 2.2.9
 
 ### Patch Changes
