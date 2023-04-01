@@ -1,5 +1,11 @@
 # compile-include-html
 
+## 2.2.13
+
+### Patch Changes
+
+- 3e191e8: add experimental vite plugin
+
 ## 2.2.12
 
 ### Patch Changes
